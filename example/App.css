@@ -1,0 +1,41 @@
+body {
+  margin: 0;
+}
+
+.selectable-area {
+  --total-tracks: 5;
+
+  display: grid;
+  gap: 1em;
+  grid-template-columns: repeat(var(--total-tracks), 1fr);
+  grid-template-rows: repeat(var(--total-tracks), 1fr);
+  position: relative;
+
+  height: 100vh;
+}
+
+.selectable-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: green;
+}
+
+.selectable-item.selecting {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+.selectable-item.selected:not(.selecting) {
+  background-color: red;
+}
+
+.selectable-item.selected.selecting {
+  background-color: rgba(255, 0, 0, 0.75);
+}
+
+.selection-box {
+  position: absolute;
+
+  background-color: rgba(0, 0, 0, 0.4);
+}
