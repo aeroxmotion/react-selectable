@@ -1,9 +1,13 @@
 {
   "name": "react-selectable",
   "version": "0.0.0",
+  "main": "dist/react-selectable-cjs.js",
+  "module": "dist/react-selectable-es.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && pnpm run build:dts",
+    "build:dts": "tsc src/index.ts --declaration --emitDeclarationOnly --jsx react --esModuleInterop --outDir dist",
     "serve": "vite preview"
   },
   "dependencies": {

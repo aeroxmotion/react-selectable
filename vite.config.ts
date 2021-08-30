@@ -7,12 +7,12 @@ export default defineConfig({
   plugins: [reactRefresh()],
   build: {
     lib: {
-      entry: path.resolve(__dirname, '../src/index.ts'),
-      formats: ['es'],
-      fileName: format => `react-selectable-${format}.js`
+      entry: path.resolve(__dirname, './src/index.ts'),
+      formats: ['es', 'cjs'],
+      fileName: (format) => `react-selectable-${format}.js`,
     },
     rollupOptions: {
-      external: ['react']
-    }
-  }
+      external: ['react'],
+    },
+  },
 })
