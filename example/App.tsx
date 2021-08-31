@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
 import { mock } from '@mockpiler/compiler'
 
-import { SelectableArea, SelectableItem, SelectionBox } from '../src'
+import {
+  SelectableArea,
+  SelectableItem,
+  SelectionBox,
+  SelectableAreaOptions,
+} from '../src'
 import './App.css'
 
 const items: any[] = mock({
@@ -16,20 +21,31 @@ const items: any[] = mock({
   ]
 `
 
+const selectionModes: SelectableAreaOptions['selectionMode'][] = ['shift']
+
 function App() {
-  const [shiftMode, setShiftMode] = useState(true)
+  const [selectionMode, setSelectionMode] =
+    useState<SelectableAreaOptions['selectionMode']>()
+  const [toggleOnClick, setToggleOnClick] = useState(true)
   const [selectionEnabled, setSelectionEnabled] = useState(true)
 
-  const toggleShiftMode = () => setShiftMode((prevShiftMode) => !prevShiftMode)
+  const toggleToggleOnClick = () =>
+    setToggleOnClick((prevToggleOnClick) => !prevToggleOnClick)
   const toggleSelectionEnabled = () =>
     setSelectionEnabled((prevSelectionEnabled) => !prevSelectionEnabled)
+
+  const handleSelectionModeOnChange: React.SelectHTMLAttributes<HTMLSelectElement>['onChange'] =
+    (e) => {
+      setSelectionMode(e.target.value as any)
+    }
 
   return (
     <SelectableArea
       options={{
         selectionEnabled,
-        shiftMode,
-        ignoreMouseEvents: ['.fixed-buttons > button'],
+        selectionMode,
+        toggleOnClick,
+        ignoreMouseEvents: ['.fixed-buttons *'],
       }}>
       <SelectionBox />
 
@@ -38,8 +54,21 @@ function App() {
       ))}
 
       <div className="fixed-buttons">
-        <button onClick={toggleShiftMode}>
-          Shift Mode: {shiftMode ? 'ON' : 'OFF'}
+        <span>
+          Selection Mode:
+          <select onChange={handleSelectionModeOnChange} value={selectionMode}>
+            <option value={undefined}>default</option>
+
+            {selectionModes.map((mode) => (
+              <option key={mode} value={mode}>
+                {mode}
+              </option>
+            ))}
+          </select>
+        </span>
+
+        <button onClick={toggleToggleOnClick}>
+          Toggle On Click: {toggleOnClick ? 'ON' : 'OFF'}
         </button>
 
         <button onClick={toggleSelectionEnabled}>

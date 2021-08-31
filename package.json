@@ -1,5 +1,5 @@
 {
-  "name": "react-selectable",
+  "name": "@aeroxmotion/react-selectable",
   "version": "0.0.0",
   "main": "dist/react-selectable-cjs.js",
   "module": "dist/react-selectable-es.js",
@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc && vite build && pnpm run build:dts",
     "build:dts": "tsc src/index.ts --declaration --emitDeclarationOnly --jsx react --esModuleInterop --outDir dist",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "react": "^17.0.0",

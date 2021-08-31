@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 
 import { useSelectableArea } from './useSelectableArea'
-import type { SelectionBoxObject } from '../contexts/SelectableAreaContext'
+import type {
+  SelectionBoxObject,
+  SelectionEvent,
+} from '../contexts/SelectableAreaContext'
+import { mergeUnsubFns } from '../utils'
 
 export const useSelectionBox = () => {
   const { events } = useSelectableArea()
@@ -11,26 +15,19 @@ export const useSelectionBox = () => {
   )
 
   useEffect(() => {
-    const onSelectionChange = (e: CustomEvent<SelectionBoxObject>) => {
-      setSelectionBox(e.detail)
+    const onSelectionChange = (e: CustomEvent<SelectionEvent>) => {
+      setSelectionBox(e.detail.selectionBox)
     }
 
-    const onSelectionEnd = (_: CustomEvent<SelectionBoxObject>) => {
+    const onSelectionEnd = (_: CustomEvent<SelectionEvent>) => {
       setSelectionBox(null)
     }
 
-    const removeSelectionStart = events.on('selectionStart', onSelectionChange)
-    const removeSelectionChange = events.on(
-      'selectionChange',
-      onSelectionChange
-    )
-    const removeSelectionEnd = events.on('selectionEnd', onSelectionEnd)
-
-    return () => {
-      removeSelectionStart()
-      removeSelectionChange()
-      removeSelectionEnd()
-    }
+    return mergeUnsubFns([
+      events.on('selectionStart', onSelectionChange),
+      events.on('selectionChange', onSelectionChange),
+      events.on('selectionEnd', onSelectionEnd),
+    ])
   }, [])
 
   return selectionBox

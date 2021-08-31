@@ -1,14 +1,12 @@
 import React, { useEffect, useRef } from 'react'
 
-import type { SelectionBoxObject } from '../contexts/SelectableAreaContext'
-import {
-  SelectableItemContext,
-  SelectableItemContextValue,
-} from '../contexts/SelectableItemContext'
+import type { SelectionEvent } from '../contexts/SelectableAreaContext'
+import { SelectableItemContext } from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
-import { isItemIntersected, useShallowState } from '../utils'
+import { isItemIntersected, mergeUnsubFns, useShallowState } from '../utils'
 
-export type SelectableItemState = Omit<SelectableItemContextValue, 'itemRef'>
+// TODO: Should be configurable by user's options?
+const TOGGLE_ON_CLICK_TRESHOLD = 5
 
 export function selectableItem<T extends React.FC<any>>(Comp: T): T {
   const AnyComp = Comp as any
@@ -18,7 +16,7 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
 
     const itemRef = useRef<Element | null>(null)
 
-    const [state, updateState] = useShallowState<SelectableItemState>(() => ({
+    const [state, updateState] = useShallowState(() => ({
       selected: false,
       selecting: false,
     }))
@@ -27,19 +25,46 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
       const $area = areaRef.current!
       const $item = itemRef.current!
 
-      const onSelecting = (e: CustomEvent<SelectionBoxObject>) => {
+      let selectionStartEvent: SelectionEvent | null = null
+
+      const onSelectionStart = (e: CustomEvent<SelectionEvent>) => {
+        selectionStartEvent = e.detail
+        onSelecting(e)
+      }
+
+      const onSelecting = (e: CustomEvent<SelectionEvent>) => {
         updateState({
-          selecting: isItemIntersected($area, $item, e.detail),
+          selecting: isItemIntersected($area, $item, e.detail.selectionBox),
         })
       }
 
-      const onSelected = (e: CustomEvent<SelectionBoxObject>) => {
+      const onSelected = (e: CustomEvent<SelectionEvent>) => {
+        const {
+          originalEvent: { target: startTarget },
+        } = selectionStartEvent!
+        const {
+          originalEvent: { target: endTarget },
+          selectionBox: endSelectionBox,
+        } = e.detail
+
+        const getToggleOnClick = (prevSelected: boolean) =>
+          // Check for start selection target
+          ($item === startTarget || $item.contains(startTarget as any)) &&
+          // Check for end selection target
+          ($item === endTarget || $item.contains(endTarget as any)) &&
+          endSelectionBox.width <= TOGGLE_ON_CLICK_TRESHOLD &&
+          endSelectionBox.width <= TOGGLE_ON_CLICK_TRESHOLD
+            ? !prevSelected
+            : true
+
         updateState((prevState) => ({
           selecting: false,
-          selected:
-            isItemIntersected($area, $item, e.detail) ||
-            (!!options.shiftMode && prevState.selected),
+          selected: isItemIntersected($area, $item, e.detail.selectionBox)
+            ? !options.toggleOnClick || getToggleOnClick(prevState.selected)
+            : options.selectionMode === 'shift' && prevState.selected,
         }))
+
+        selectionStartEvent = null
       }
 
       const onSelectAll = () => {
@@ -50,21 +75,15 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
         updateState({ selected: false })
       }
 
-      const unsubs = [
-        events.on('selectionStart', onSelecting),
+      return mergeUnsubFns([
+        events.on('selectionStart', onSelectionStart),
         events.on('selectionChange', onSelecting),
         events.on('selectionEnd', onSelected),
 
         events.on('selectAll', onSelectAll),
         events.on('deselectAll', onDeselectAll),
-      ]
-
-      return () => {
-        for (const unsub of unsubs) {
-          unsub()
-        }
-      }
-    }, [options.shiftMode])
+      ])
+    }, [options.selectionMode, options.toggleOnClick])
 
     return (
       <SelectableItemContext.Provider

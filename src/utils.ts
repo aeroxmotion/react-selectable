@@ -90,3 +90,9 @@ export const getRelativeCoordinates = ($area: Element, e: MouseEvent) => {
     y: e.clientY - areaRect.y,
   }
 }
+
+export const mergeUnsubFns = (unsubFns: Array<() => void>) => () => {
+  for (const unsubFn of unsubFns) {
+    unsubFn()
+  }
+}

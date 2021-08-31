@@ -5,6 +5,7 @@ import {
   SelectionBoxObject,
   SelectableAreaContext,
   SelectableAreaOptions,
+  SelectionEvent,
 } from '../contexts/SelectableAreaContext'
 import { EventEmitter } from '../EventEmitter'
 import { getRelativeCoordinates, guardMouseHandler } from '../utils'
@@ -18,17 +19,17 @@ export interface SelectableAreaComponentProps {
   /**
    *
    */
-  onSelectionStart?: (selectionBox: SelectionBoxObject) => void
+  onSelectionStart?: (selection: SelectionEvent) => void
 
   /**
    *
    */
-  onSelectionChange?: (selectionBox: SelectionBoxObject) => void
+  onSelectionChange?: (selection: SelectionEvent) => void
 
   /**
    *
    */
-  onSelectionEnd?: (selectionBox: SelectionBoxObject) => void
+  onSelectionEnd?: (selection: SelectionEvent) => void
 }
 
 export type SelectableAreaComponent<T> = T extends React.ComponentType<
@@ -68,7 +69,9 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
 
       const $area = areaRef.current!
 
-      const onMousedown = guardMouseHandler(ignoreMouseEvents, (e) => {
+      const onMouseDown = guardMouseHandler(ignoreMouseEvents, (e) => {
+        console.log('Mouse down', e)
+
         const nextSelectionBox: SelectionBoxObject = {
           ...getRelativeCoordinates($area, e),
           width: 0,
@@ -78,21 +81,33 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         startSelectionBoxRef.current = selectionBoxRef.current =
           nextSelectionBox
 
-        onSelectionStart(nextSelectionBox)
-        events.trigger('selectionStart', nextSelectionBox)
+        const selectionEvent: SelectionEvent = {
+          originalEvent: e,
+          selectionBox: nextSelectionBox,
+        }
 
-        $area!.addEventListener('mousemove', onMousemove)
+        onSelectionStart(selectionEvent)
+        events.trigger('selectionStart', selectionEvent)
+
+        $area!.addEventListener('mousemove', onMouseMove)
       })
 
-      const onMouseup = guardMouseHandler(ignoreMouseEvents, () => {
-        onSelectionEnd(selectionBoxRef.current!)
-        events.trigger('selectionEnd', selectionBoxRef.current!)
+      const onMouseUp = guardMouseHandler(ignoreMouseEvents, (e) => {
+        console.log('Mouse up', e)
+
+        const selectionEvent: SelectionEvent = {
+          originalEvent: e,
+          selectionBox: selectionBoxRef.current!,
+        }
+
+        onSelectionEnd(selectionEvent)
+        events.trigger('selectionEnd', selectionEvent)
         startSelectionBoxRef.current = selectionBoxRef.current = null
 
-        $area!.removeEventListener('mousemove', onMousemove)
+        $area!.removeEventListener('mousemove', onMouseMove)
       })
 
-      const onMousemove = guardMouseHandler(ignoreMouseEvents, (e) => {
+      const onMouseMove = guardMouseHandler(ignoreMouseEvents, (e) => {
         const { current: startSelectionBox } = startSelectionBoxRef
         const { x, y } = getRelativeCoordinates($area, e)
 
@@ -103,20 +118,25 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
           height: Math.abs(y - startSelectionBox!.y),
         }
 
-        onSelectionChange(nextSelectionBox)
+        const selectionEvent: SelectionEvent = {
+          originalEvent: e,
+          selectionBox: nextSelectionBox,
+        }
+
+        onSelectionChange(selectionEvent)
         selectionBoxRef.current = nextSelectionBox
-        events.trigger('selectionChange', nextSelectionBox)
+        events.trigger('selectionChange', selectionEvent)
       })
 
-      $area!.addEventListener('mousedown', onMousedown)
-      $area!.addEventListener('mouseup', onMouseup)
+      $area!.addEventListener('mousedown', onMouseDown)
+      $area!.addEventListener('mouseup', onMouseUp)
 
       return () => {
-        $area!.removeEventListener('mousedown', onMousedown)
-        $area!.removeEventListener('mouseup', onMouseup)
+        $area!.removeEventListener('mousedown', onMouseDown)
+        $area!.removeEventListener('mouseup', onMouseUp)
 
         // Whether the component is unmount during `mousemove`
-        $area!.removeEventListener('mousemove', onMousemove)
+        $area!.removeEventListener('mousemove', onMouseMove)
       }
     }, [
       options.selectionEnabled,

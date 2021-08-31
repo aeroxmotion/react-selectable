@@ -4,21 +4,26 @@ import type { EventEmitter } from '../EventEmitter'
 
 export type SelectableElement = HTMLElement | SVGElement
 
+export type SelectionEvent = {
+  originalEvent: MouseEvent
+  selectionBox: SelectionBoxObject
+}
+
 export interface SelectableEvents {
   /**
    *
    */
-  selectionStart: SelectionBoxObject
+  selectionStart: SelectionEvent
 
   /**
    *
    */
-  selectionChange: SelectionBoxObject
+  selectionChange: SelectionEvent
 
   /**
    *
    */
-  selectionEnd: SelectionBoxObject
+  selectionEnd: SelectionEvent
 
   /**
    *
@@ -55,17 +60,26 @@ export interface SelectionBoxObject {
 
 export interface SelectableAreaOptions {
   /**
-   * TODO
+   * Toggle `selected` item. Useful in conjunction
+   * with shift's selection mode
+   */
+  toggleOnClick?: boolean
+
+  /**
+   * When `true` selection is enabled
    */
   selectionEnabled?: boolean
 
   /**
-   * TODO
+   * Selection mode.
+   *
+   * 'shift': Add selected items on new selections
+   * 'default' (no value): Only persists selected items from the last selection
    */
-  shiftMode?: boolean
+  selectionMode?: 'shift'
 
   /**
-   * TODO
+   * Set of CSS selectors to ignore elements from selection
    */
   ignoreMouseEvents?: string[]
 }
