@@ -65,6 +65,19 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
 
       const { current: $area } = areaRef
 
+      const guardMouseHandler =
+        (handler: (e: MouseEvent) => void) => (e: MouseEvent) => {
+          if (options.ignoreMouseEvents?.length) {
+            const ignoreSelector = options.ignoreMouseEvents.join(', ')
+
+            if ((e.target as Element).matches(ignoreSelector)) {
+              return
+            }
+          }
+
+          handler(e)
+        }
+
       const getRelativeCoordinates = (e: MouseEvent) => {
         const areaRect = $area!.getBoundingClientRect()
 
@@ -74,7 +87,7 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         }
       }
 
-      const onMousedown = (e: MouseEvent) => {
+      const onMousedown = guardMouseHandler((e) => {
         const nextSelectionBox: SelectionBoxObject = {
           ...getRelativeCoordinates(e),
           width: 0,
@@ -88,17 +101,17 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         events.trigger('selectionStart', nextSelectionBox)
 
         $area!.addEventListener('mousemove', onMousemove)
-      }
+      })
 
-      const onMouseup = (_: MouseEvent) => {
+      const onMouseup = guardMouseHandler(() => {
         onSelectionEnd(selectionBoxRef.current!)
         events.trigger('selectionEnd', selectionBoxRef.current!)
         startSelectionBoxRef.current = selectionBoxRef.current = null
 
         $area!.removeEventListener('mousemove', onMousemove)
-      }
+      })
 
-      const onMousemove = (e: MouseEvent) => {
+      const onMousemove = guardMouseHandler((e) => {
         const { current: startSelectionBox } = startSelectionBoxRef
         const { x, y } = getRelativeCoordinates(e)
 
@@ -112,7 +125,7 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         onSelectionChange(nextSelectionBox)
         selectionBoxRef.current = nextSelectionBox
         events.trigger('selectionChange', nextSelectionBox)
-      }
+      })
 
       $area!.addEventListener('mousedown', onMousedown)
       $area!.addEventListener('mouseup', onMouseup)
@@ -126,6 +139,7 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
       }
     }, [
       options.selectionEnabled,
+      options.ignoreMouseEvents,
       onSelectionStart,
       onSelectionChange,
       onSelectionEnd,

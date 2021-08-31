@@ -41,3 +41,9 @@ body {
 
   background-color: rgba(0, 0, 0, 0.4);
 }
+
+.fixed-buttons {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+}

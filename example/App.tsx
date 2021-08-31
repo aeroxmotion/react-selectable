@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { mock } from '@mockpiler/compiler'
 
 import { SelectableArea, SelectableItem, SelectionBox } from '../src'
@@ -17,13 +17,35 @@ const items: any[] = mock({
 `
 
 function App() {
+  const [shiftMode, setShiftMode] = useState(true)
+  const [selectionEnabled, setSelectionEnabled] = useState(true)
+
+  const toggleShiftMode = () => setShiftMode((prevShiftMode) => !prevShiftMode)
+  const toggleSelectionEnabled = () =>
+    setSelectionEnabled((prevSelectionEnabled) => !prevSelectionEnabled)
+
   return (
-    <SelectableArea options={{ shiftMode: true }}>
+    <SelectableArea
+      options={{
+        selectionEnabled,
+        shiftMode,
+        ignoreMouseEvents: ['.fixed-buttons > button'],
+      }}>
       <SelectionBox />
 
       {items.map((item) => (
         <SelectableItem key={item.id}>{item.text}</SelectableItem>
       ))}
+
+      <div className="fixed-buttons">
+        <button onClick={toggleShiftMode}>
+          Shift Mode: {shiftMode ? 'ON' : 'OFF'}
+        </button>
+
+        <button onClick={toggleSelectionEnabled}>
+          Selection Enabled: {selectionEnabled ? 'ON' : 'OFF'}
+        </button>
+      </div>
     </SelectableArea>
   )
 }

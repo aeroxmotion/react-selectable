@@ -63,6 +63,11 @@ export interface SelectableAreaOptions {
    * TODO
    */
   shiftMode?: boolean
+
+  /**
+   * TODO
+   */
+  ignoreMouseEvents?: string[]
 }
 
 export interface SelectableAreaContextValue {
