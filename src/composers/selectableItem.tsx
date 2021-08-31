@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import type { SelectionBoxObject } from '../contexts/SelectableAreaContext'
 import {
@@ -6,11 +6,9 @@ import {
   SelectableItemContextValue,
 } from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
+import { isItemIntersected, useShallowState } from '../utils'
 
 export type SelectableItemState = Omit<SelectableItemContextValue, 'itemRef'>
-
-// Internal type
-type PartialState = Partial<SelectableItemState>
 
 export function selectableItem<T extends React.FC<any>>(Comp: T): T {
   const AnyComp = Comp as any
@@ -20,71 +18,18 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
 
     const itemRef = useRef<Element | null>(null)
 
-    const [state, setState] = useState<SelectableItemState>(() => ({
+    const [state, updateState] = useShallowState<SelectableItemState>(() => ({
       selected: false,
       selecting: false,
     }))
 
-    const updateState = (
-      nextState:
-        | PartialState
-        | ((prevState: SelectableItemState) => PartialState)
-    ) => {
-      setState((prevState) => {
-        const nextStateObj =
-          typeof nextState === 'function' ? nextState(prevState) : nextState
-
-        const keys: Array<keyof SelectableItemState> = Object.keys(
-          nextStateObj
-        ) as any
-
-        for (const key of keys) {
-          if (prevState[key] !== nextStateObj[key]) {
-            return {
-              ...prevState,
-              ...nextStateObj,
-            }
-          }
-        }
-
-        return prevState
-      })
-    }
-
-    const isItemIntersected = (selectionBox: SelectionBoxObject) => {
-      const { current: $item } = itemRef
-
-      const itemRect = $item!.getBoundingClientRect()
-      const areaRect = areaRef.current!.getBoundingClientRect()
-
-      const itemCoordinates = {
-        x: itemRect.x - areaRect.x,
-        y: itemRect.y - areaRect.y,
-      }
-
-      if (itemCoordinates.x + itemRect.width < selectionBox.x) {
-        return false
-      }
-
-      if (itemCoordinates.x > selectionBox.x + selectionBox.width) {
-        return false
-      }
-
-      if (itemCoordinates.y + itemRect.height < selectionBox.y) {
-        return false
-      }
-
-      if (itemCoordinates.y > selectionBox.y + selectionBox.height) {
-        return false
-      }
-
-      return true
-    }
-
     useEffect(() => {
+      const $area = areaRef.current!
+      const $item = itemRef.current!
+
       const onSelecting = (e: CustomEvent<SelectionBoxObject>) => {
         updateState({
-          selecting: isItemIntersected(e.detail),
+          selecting: isItemIntersected($area, $item, e.detail),
         })
       }
 
@@ -92,7 +37,7 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
         updateState((prevState) => ({
           selecting: false,
           selected:
-            isItemIntersected(e.detail) ||
+            isItemIntersected($area, $item, e.detail) ||
             (!!options.shiftMode && prevState.selected),
         }))
       }
