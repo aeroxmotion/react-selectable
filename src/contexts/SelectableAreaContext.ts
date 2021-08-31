@@ -53,6 +53,18 @@ export interface SelectionBoxObject {
   readonly height: number
 }
 
+export interface SelectableAreaOptions {
+  /**
+   * TODO
+   */
+  selectionEnabled?: boolean
+
+  /**
+   * TODO
+   */
+  shiftMode?: boolean
+}
+
 export interface SelectableAreaContextValue {
   /**
    * Selectable area's ref container
@@ -63,6 +75,11 @@ export interface SelectableAreaContextValue {
    * Events manager
    */
   readonly events: EventEmitter<SelectableEvents>
+
+  /**
+   * TODO
+   */
+  readonly options: SelectableAreaOptions
 }
 
 export const SelectableAreaContext = createContext<SelectableAreaContextValue>(

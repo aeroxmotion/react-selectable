@@ -18,7 +18,7 @@ const items: any[] = mock({
 
 function App() {
   return (
-    <SelectableArea>
+    <SelectableArea options={{ shiftMode: true }}>
       <SelectionBox />
 
       {items.map((item) => (

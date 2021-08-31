@@ -8,7 +8,7 @@ export interface SelectableAreaProps
   // Leave empty for now
 }
 
-export const SelectableArea: React.FC<SelectableAreaProps> = selectableArea(
+export const SelectableArea = selectableArea<React.FC<SelectableAreaProps>>(
   ({ className = 'selectable-area', children, ...attributes }) => {
     const { areaRef } = useSelectableArea()
 

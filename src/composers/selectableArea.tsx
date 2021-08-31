@@ -4,13 +4,51 @@ import {
   SelectableAreaContextValue,
   SelectionBoxObject,
   SelectableAreaContext,
+  SelectableAreaOptions,
 } from '../contexts/SelectableAreaContext'
 import { EventEmitter } from '../EventEmitter'
 
-export function selectableArea<T extends React.FC<any>>(Comp: T): T {
+export interface SelectableAreaComponentProps {
+  /**
+   *
+   */
+  options?: SelectableAreaOptions
+
+  /**
+   *
+   */
+  onSelectionStart?: (selectionBox: SelectionBoxObject) => void
+
+  /**
+   *
+   */
+  onSelectionChange?: (selectionBox: SelectionBoxObject) => void
+
+  /**
+   *
+   */
+  onSelectionEnd?: (selectionBox: SelectionBoxObject) => void
+}
+
+export type SelectableAreaComponent<T> = T extends React.ComponentType<
+  infer Props
+>
+  ? React.FC<Props & SelectableAreaComponentProps>
+  : never
+
+const noop = () => {}
+const EMPTY_OPTIONS: SelectableAreaOptions = {}
+
+export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
   const AnyComp = Comp as any
 
-  const Result: React.FC<any> = ({ ...props }) => {
+  const Result: React.FC<SelectableAreaComponentProps> = ({
+    options = EMPTY_OPTIONS,
+    onSelectionStart = noop,
+    onSelectionChange = noop,
+    onSelectionEnd = noop,
+    ...props
+  }) => {
     const areaRef = useRef<HTMLElement | null>(null)
     const startSelectionBoxRef = useRef<SelectionBoxObject | null>(null)
     const selectionBoxRef = useRef<SelectionBoxObject | null>(null)
@@ -21,6 +59,10 @@ export function selectableArea<T extends React.FC<any>>(Comp: T): T {
     )
 
     useEffect(() => {
+      if (options.selectionEnabled === false) {
+        return
+      }
+
       const { current: $area } = areaRef
 
       const getRelativeCoordinates = (e: MouseEvent) => {
@@ -41,12 +83,15 @@ export function selectableArea<T extends React.FC<any>>(Comp: T): T {
 
         startSelectionBoxRef.current = selectionBoxRef.current =
           nextSelectionBox
+
+        onSelectionStart(nextSelectionBox)
         events.trigger('selectionStart', nextSelectionBox)
 
         $area!.addEventListener('mousemove', onMousemove)
       }
 
       const onMouseup = (_: MouseEvent) => {
+        onSelectionEnd(selectionBoxRef.current!)
         events.trigger('selectionEnd', selectionBoxRef.current!)
         startSelectionBoxRef.current = selectionBoxRef.current = null
 
@@ -64,6 +109,7 @@ export function selectableArea<T extends React.FC<any>>(Comp: T): T {
           height: Math.abs(y - startSelectionBox!.y),
         }
 
+        onSelectionChange(nextSelectionBox)
         selectionBoxRef.current = nextSelectionBox
         events.trigger('selectionChange', nextSelectionBox)
       }
@@ -78,18 +124,19 @@ export function selectableArea<T extends React.FC<any>>(Comp: T): T {
         // Whether the component is unmount during `mousemove`
         $area!.removeEventListener('mousemove', onMousemove)
       }
-    }, [])
+    }, [
+      options.selectionEnabled,
+      onSelectionStart,
+      onSelectionChange,
+      onSelectionEnd,
+    ])
 
     return (
-      <SelectableAreaContext.Provider
-        value={{
-          areaRef,
-          events,
-        }}>
+      <SelectableAreaContext.Provider value={{ areaRef, events, options }}>
         <AnyComp {...props} />
       </SelectableAreaContext.Provider>
     )
   }
 
-  return Result as T
+  return Result as any
 }

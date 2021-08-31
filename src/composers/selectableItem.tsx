@@ -1,21 +1,55 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import type { SelectionBoxObject } from '../contexts/SelectableAreaContext'
-import { SelectableItemContext } from '../contexts/SelectableItemContext'
+import {
+  SelectableItemContext,
+  SelectableItemContextValue,
+} from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
 
-let i = 0
+export type SelectableItemState = Omit<SelectableItemContextValue, 'itemRef'>
+
+// Internal type
+type PartialState = Partial<SelectableItemState>
 
 export function selectableItem<T extends React.FC<any>>(Comp: T): T {
   const AnyComp = Comp as any
 
   const Result: React.FC<any> = ({ ...props }) => {
-    const { areaRef, events } = useSelectableArea()
+    const { areaRef, events, options } = useSelectableArea()
 
     const itemRef = useRef<Element | null>(null)
 
-    const [selecting, setSelecting] = useState(false)
-    const [selected, setSelected] = useState(false)
+    const [state, setState] = useState<SelectableItemState>(() => ({
+      selected: false,
+      selecting: false,
+    }))
+
+    const updateState = (
+      nextState:
+        | PartialState
+        | ((prevState: SelectableItemState) => PartialState)
+    ) => {
+      setState((prevState) => {
+        const nextStateObj =
+          typeof nextState === 'function' ? nextState(prevState) : nextState
+
+        const keys: Array<keyof SelectableItemState> = Object.keys(
+          nextStateObj
+        ) as any
+
+        for (const key of keys) {
+          if (prevState[key] !== nextStateObj[key]) {
+            return {
+              ...prevState,
+              ...nextStateObj,
+            }
+          }
+        }
+
+        return prevState
+      })
+    }
 
     const isItemIntersected = (selectionBox: SelectionBoxObject) => {
       const { current: $item } = itemRef
@@ -27,8 +61,6 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
         x: itemRect.x - areaRect.x,
         y: itemRect.y - areaRect.y,
       }
-
-      console.log('Itembox', ++i, itemRect)
 
       if (itemCoordinates.x + itemRect.width < selectionBox.x) {
         return false
@@ -51,36 +83,49 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
 
     useEffect(() => {
       const onSelecting = (e: CustomEvent<SelectionBoxObject>) => {
-        setSelecting(isItemIntersected(e.detail))
+        updateState({
+          selecting: isItemIntersected(e.detail),
+        })
       }
 
       const onSelected = (e: CustomEvent<SelectionBoxObject>) => {
-        setSelected(isItemIntersected(e.detail))
-        setSelecting(false)
+        updateState((prevState) => ({
+          selecting: false,
+          selected:
+            isItemIntersected(e.detail) ||
+            (!!options.shiftMode && prevState.selected),
+        }))
       }
 
       const onSelectAll = () => {
-        setSelected(true)
+        updateState({ selected: true })
       }
 
       const onDeselectAll = () => {
-        setSelected(false)
+        updateState({ selected: false })
       }
 
-      events.on('selectionStart', onSelecting)
-      events.on('selectionChange', onSelecting)
-      events.on('selectionEnd', onSelected)
+      const unsubs = [
+        events.on('selectionStart', onSelecting),
+        events.on('selectionChange', onSelecting),
+        events.on('selectionEnd', onSelected),
 
-      events.on('selectAll', onSelectAll)
-      events.on('deselectAll', onDeselectAll)
-    }, [])
+        events.on('selectAll', onSelectAll),
+        events.on('deselectAll', onDeselectAll),
+      ]
+
+      return () => {
+        for (const unsub of unsubs) {
+          unsub()
+        }
+      }
+    }, [options.shiftMode])
 
     return (
       <SelectableItemContext.Provider
         value={{
           itemRef,
-          selecting,
-          selected,
+          ...state,
         }}>
         <AnyComp {...props} />
       </SelectableItemContext.Provider>
