@@ -6,7 +6,11 @@ My own implementation of `react-selectable-fast`
 
 ```tsx
 import { render } from 'react-dom'
-import { SelectableArea, SelectableItem } from '@aeroxmotion/react-selectable'
+import {
+  SelectableArea,
+  SelectableItem,
+  SelectionBox,
+} from '@aeroxmotion/react-selectable'
 
 const items = [
   {
@@ -26,6 +30,8 @@ const items = [
 const MyComponent = () => {
   return (
     <SelectableArea>
+      <SelectionBox />
+
       {items.map((item) => (
         <SelectableItem key={item.id}>
           <p>{item.name}</p>
