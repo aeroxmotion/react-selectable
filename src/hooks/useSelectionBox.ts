@@ -15,11 +15,11 @@ export const useSelectionBox = () => {
   )
 
   useEffect(() => {
-    const onSelectionChange = (e: CustomEvent<SelectionEvent>) => {
-      setSelectionBox(e.detail.selectionBox)
+    const onSelectionChange = (e: SelectionEvent) => {
+      setSelectionBox(e.selectionBox)
     }
 
-    const onSelectionEnd = (_: CustomEvent<SelectionEvent>) => {
+    const onSelectionEnd = (_: SelectionEvent) => {
       setSelectionBox(null)
     }
 

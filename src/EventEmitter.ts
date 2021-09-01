@@ -2,17 +2,32 @@ export type EventMapping = {
   [eventName: string]: any
 }
 
-export class EventEmitter<T extends EventMapping> extends EventTarget {
-  on<K extends keyof T>(
-    eventName: K,
-    listener: (event: CustomEvent<T[K]>) => void
-  ) {
-    super.addEventListener(eventName as string, listener as any)
+export class EventEmitter<T extends EventMapping> extends Map<
+  keyof T,
+  Set<(event: T[keyof T]) => void>
+> {
+  on<K extends keyof T>(eventName: K, listener: (event: T[K]) => void) {
+    const listeners = super.get(eventName) ?? new Set()
 
-    return () => super.removeEventListener(eventName as string, listener as any)
+    listeners.add(listener as any)
+    super.set(eventName, listeners)
+
+    return () => {
+      listeners.delete(listener as any)
+
+      if (!listeners.size) {
+        super.delete(eventName)
+      }
+    }
   }
 
   trigger<K extends keyof T>(eventName: K, detail?: T[K]) {
-    super.dispatchEvent(new CustomEvent(eventName as string, { detail }))
+    const listeners = super.get(eventName)
+
+    if (listeners) {
+      for (const listener of listeners) {
+        listener(detail!)
+      }
+    }
   }
 }

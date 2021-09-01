@@ -27,25 +27,25 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
 
       let selectionStartEvent: SelectionEvent | null = null
 
-      const onSelectionStart = (e: CustomEvent<SelectionEvent>) => {
-        selectionStartEvent = e.detail
+      const onSelectionStart = (e: SelectionEvent) => {
+        selectionStartEvent = e
         onSelecting(e)
       }
 
-      const onSelecting = (e: CustomEvent<SelectionEvent>) => {
+      const onSelecting = (e: SelectionEvent) => {
         updateState({
-          selecting: isItemIntersected($area, $item, e.detail.selectionBox),
+          selecting: isItemIntersected($area, $item, e.selectionBox),
         })
       }
 
-      const onSelected = (e: CustomEvent<SelectionEvent>) => {
+      const onSelected = (e: SelectionEvent) => {
         const {
           originalEvent: { target: startTarget },
         } = selectionStartEvent!
         const {
           originalEvent: { target: endTarget },
           selectionBox: endSelectionBox,
-        } = e.detail
+        } = e
 
         const getToggleOnClick = (prevSelected: boolean) =>
           // Check for start selection target
@@ -59,7 +59,7 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
 
         updateState((prevState) => ({
           selecting: false,
-          selected: isItemIntersected($area, $item, e.detail.selectionBox)
+          selected: isItemIntersected($area, $item, e.selectionBox)
             ? !options.toggleOnClick || getToggleOnClick(prevState.selected)
             : options.selectionMode === 'shift' && prevState.selected,
         }))
