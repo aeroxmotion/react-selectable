@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && pnpm run build:dts",
-    "build:dts": "tsc src/index.ts --declaration --emitDeclarationOnly --jsx react --esModuleInterop --outDir dist",
+    "build:dts": "tsc --project tsconfig.types.json",
     "serve": "vite preview",
     "prepublishOnly": "pnpm build"
   },

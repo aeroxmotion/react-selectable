@@ -25,9 +25,7 @@ export class EventEmitter<T extends EventMapping> extends Map<
     const listeners = super.get(eventName)
 
     if (listeners) {
-      for (const listener of listeners) {
-        listener(detail!)
-      }
+      listeners.forEach((listener) => listener(detail!))
     }
   }
 }
