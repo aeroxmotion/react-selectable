@@ -53,7 +53,7 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
           // Check for end selection target
           ($item === endTarget || $item.contains(endTarget as any)) &&
           endSelectionBox.width <= TOGGLE_ON_CLICK_TRESHOLD &&
-          endSelectionBox.width <= TOGGLE_ON_CLICK_TRESHOLD
+          endSelectionBox.height <= TOGGLE_ON_CLICK_TRESHOLD
             ? !prevSelected
             : true
 
