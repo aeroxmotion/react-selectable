@@ -46,4 +46,8 @@ body {
   position: fixed;
   bottom: 1em;
   right: 1em;
+
+  padding: 0.5em;
+
+  background-color: #fff;
 }

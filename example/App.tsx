@@ -45,7 +45,7 @@ function App() {
         selectionEnabled,
         selectionMode,
         toggleOnClick,
-        ignoreMouseEvents: ['.fixed-buttons *'],
+        ignore: ['.fixed-buttons', '.fixed-buttons *'],
       }}>
       <SelectionBox />
 

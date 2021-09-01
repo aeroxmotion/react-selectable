@@ -68,10 +68,10 @@ export const isItemIntersected = (
   return true
 }
 
-type MouseEventHandler = (e: MouseEvent) => void
+export type MouseEventHandler = (e: MouseEvent) => void
 
 export const guardMouseHandler = (
-  ignore: SelectableAreaOptions['ignoreMouseEvents'] | undefined,
+  ignore: SelectableAreaOptions['ignore'] | undefined,
   handler: MouseEventHandler
 ): MouseEventHandler =>
   !ignore?.length

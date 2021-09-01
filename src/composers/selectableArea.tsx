@@ -8,7 +8,11 @@ import {
   SelectionEvent,
 } from '../contexts/SelectableAreaContext'
 import { EventEmitter } from '../EventEmitter'
-import { getRelativeCoordinates, guardMouseHandler } from '../utils'
+import {
+  getRelativeCoordinates,
+  guardMouseHandler,
+  MouseEventHandler,
+} from '../utils'
 
 export interface SelectableAreaComponentProps {
   /**
@@ -51,6 +55,8 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
     onSelectionEnd = noop,
     ...props
   }) => {
+    const { selectionEnabled, ignore } = options
+
     const areaRef = useRef<HTMLElement | null>(null)
     const startSelectionBoxRef = useRef<SelectionBoxObject | null>(null)
     const selectionBoxRef = useRef<SelectionBoxObject | null>(null)
@@ -61,15 +67,14 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
     )
 
     useEffect(() => {
-      const { selectionEnabled, ignoreMouseEvents } = options
-
+      // Avoid selection
       if (selectionEnabled === false) {
         return
       }
 
       const $area = areaRef.current!
 
-      const onMouseDown = guardMouseHandler(ignoreMouseEvents, (e) => {
+      const onMouseDown = guardMouseHandler(ignore, (e) => {
         const nextSelectionBox: SelectionBoxObject = {
           ...getRelativeCoordinates($area, e),
           width: 0,
@@ -87,10 +92,11 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         onSelectionStart(selectionEvent)
         events.trigger('selectionStart', selectionEvent)
 
+        $area!.addEventListener('mouseup', onMouseUp)
         $area!.addEventListener('mousemove', onMouseMove)
       })
 
-      const onMouseUp = guardMouseHandler(ignoreMouseEvents, (e) => {
+      const onMouseUp: MouseEventHandler = (e) => {
         const selectionEvent: SelectionEvent = {
           originalEvent: e,
           selectionBox: selectionBoxRef.current!,
@@ -100,10 +106,11 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         events.trigger('selectionEnd', selectionEvent)
         startSelectionBoxRef.current = selectionBoxRef.current = null
 
+        $area!.removeEventListener('mouseup', onMouseUp)
         $area!.removeEventListener('mousemove', onMouseMove)
-      })
+      }
 
-      const onMouseMove = guardMouseHandler(ignoreMouseEvents, (e) => {
+      const onMouseMove: MouseEventHandler = (e) => {
         const { current: startSelectionBox } = startSelectionBoxRef
         const { x, y } = getRelativeCoordinates($area, e)
 
@@ -122,10 +129,9 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         onSelectionChange(selectionEvent)
         selectionBoxRef.current = nextSelectionBox
         events.trigger('selectionChange', selectionEvent)
-      })
+      }
 
       $area!.addEventListener('mousedown', onMouseDown)
-      $area!.addEventListener('mouseup', onMouseUp)
 
       return () => {
         $area!.removeEventListener('mousedown', onMouseDown)
@@ -135,8 +141,11 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
         $area!.removeEventListener('mousemove', onMouseMove)
       }
     }, [
-      options.selectionEnabled,
-      options.ignoreMouseEvents,
+      // Options
+      selectionEnabled,
+      ignore,
+
+      // Events
       onSelectionStart,
       onSelectionChange,
       onSelectionEnd,

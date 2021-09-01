@@ -79,9 +79,9 @@ export interface SelectableAreaOptions {
   selectionMode?: 'shift'
 
   /**
-   * Set of CSS selectors to ignore elements from selection
+   * Set of CSS selectors to ignore elements on `mousedown`
    */
-  ignoreMouseEvents?: string[]
+  ignore?: string[]
 }
 
 export interface SelectableAreaContextValue {
