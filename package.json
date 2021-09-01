@@ -4,6 +4,9 @@
   "main": "dist/react-selectable-cjs.js",
   "module": "dist/react-selectable-es.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && pnpm run build:dts",
