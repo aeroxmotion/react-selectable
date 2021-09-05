@@ -23,6 +23,8 @@ const items: any[] = mock({
 
 const selectionModes: SelectableAreaOptions['selectionMode'][] = ['shift']
 
+const logEvent = (name: string) => (e: any) => console.log(`[${name}]`, e)
+
 function App() {
   const [selectionMode, setSelectionMode] =
     useState<SelectableAreaOptions['selectionMode']>()
@@ -46,11 +48,18 @@ function App() {
         selectionMode,
         toggleOnClick,
         ignore: ['.fixed-buttons', '.fixed-buttons *'],
-      }}>
+      }}
+      onSelectionStart={logEvent('selection-start')}
+      onSelectionChange={logEvent('selection-change')}
+      onSelectionEnd={logEvent('selection-end')}
+      onSelectedItem={logEvent('selected-item')}
+      onDeselectedItem={logEvent('deselected-item')}>
       <SelectionBox />
 
       {items.map((item) => (
-        <SelectableItem key={item.id}>{item.text}</SelectableItem>
+        <SelectableItem key={item.id} selectableValue={item.id}>
+          {item.text}
+        </SelectableItem>
       ))}
 
       <div className="fixed-buttons">

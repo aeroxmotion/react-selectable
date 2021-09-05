@@ -6,11 +6,13 @@ import {
   SelectableAreaContext,
   SelectableAreaOptions,
   SelectionEvent,
+  SelectedItemEvent,
 } from '../contexts/SelectableAreaContext'
 import { EventEmitter } from '../EventEmitter'
 import {
   getRelativeCoordinates,
   guardMouseHandler,
+  mergeUnsubFns,
   MouseEventHandler,
 } from '../utils'
 
@@ -34,6 +36,16 @@ export interface SelectableAreaComponentProps {
    *
    */
   onSelectionEnd?: (selection: SelectionEvent) => void
+
+  /**
+   *
+   */
+  onSelectedItem?: (selected: SelectedItemEvent) => void
+
+  /**
+   *
+   */
+  onDeselectedItem?: (deselected: SelectedItemEvent) => void
 }
 
 const noop = () => {}
@@ -49,6 +61,8 @@ export function selectableArea<P>(
     onSelectionStart = noop,
     onSelectionChange = noop,
     onSelectionEnd = noop,
+    onSelectedItem = noop,
+    onDeselectedItem = noop,
     ...props
   }) => {
     const { selectionEnabled, ignore } = options
@@ -60,6 +74,15 @@ export function selectableArea<P>(
     const events = useMemo<SelectableAreaContextValue['events']>(
       () => new EventEmitter(),
       []
+    )
+
+    useEffect(
+      () =>
+        mergeUnsubFns([
+          events.on('selectedItem', onSelectedItem),
+          events.on('deselectedItem', onDeselectedItem),
+        ]),
+      [onSelectedItem, onDeselectedItem]
     )
 
     useEffect(() => {

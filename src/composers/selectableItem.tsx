@@ -1,6 +1,9 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 
-import type { SelectionEvent } from '../contexts/SelectableAreaContext'
+import type {
+  SelectedItemEvent,
+  SelectionEvent,
+} from '../contexts/SelectableAreaContext'
 import { SelectableItemContext } from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
 import { isItemIntersected, mergeUnsubFns, useShallowState } from '../utils'
@@ -9,23 +12,45 @@ import { isItemIntersected, mergeUnsubFns, useShallowState } from '../utils'
 const TOGGLE_ON_CLICK_TRESHOLD = 5
 
 export interface SelectableItemComponentProps {
-  // Leave empty for now
+  /**
+   *
+   */
+  selectableValue?: SelectedItemEvent['value']
 }
+
+let currentItemId = 0
 
 export function selectableItem<P>(
   Comp: React.ComponentType<P>
 ): React.FC<P & SelectableItemComponentProps> {
   const AnyComp = Comp as any
 
-  return ({ ...props }) => {
+  return ({ selectableValue, ...props }) => {
     const { areaRef, events, options } = useSelectableArea()
 
+    const itemId = useMemo(() => ++currentItemId, [])
+
+    const firstItemRender = useRef(true)
     const itemRef = useRef<Element | null>(null)
 
     const [state, updateState] = useShallowState(() => ({
       selected: false,
       selecting: false,
     }))
+
+    useEffect(() => {
+      if (firstItemRender.current) {
+        firstItemRender.current = false
+        return
+      }
+
+      // Trigger event after re-render
+      events.trigger(`${state.selected ? '' : 'de'}selectedItem`, {
+        id: itemId,
+        element: itemRef.current!,
+        value: selectableValue,
+      })
+    }, [state.selected])
 
     useEffect(() => {
       const $area = areaRef.current!

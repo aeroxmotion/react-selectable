@@ -9,6 +9,12 @@ export type SelectionEvent = {
   selectionBox: SelectionBoxObject
 }
 
+export type SelectedItemEvent = {
+  id: number
+  element: Element
+  value: any
+}
+
 export interface SelectableEvents {
   /**
    *
@@ -34,6 +40,16 @@ export interface SelectableEvents {
    *
    */
   deselectAll: void
+
+  /**
+   *
+   */
+  selectedItem: SelectedItemEvent
+
+  /**
+   *
+   */
+  deselectedItem: SelectedItemEvent
 }
 
 export interface SelectionBoxObject {
