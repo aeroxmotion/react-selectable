@@ -11,10 +11,9 @@ export interface SelectableItemProps
   children?:
     | React.ReactNode
     | ((item: Omit<SelectableItemContextValue, 'itemRef'>) => void)
-  // Leave empty for now
 }
 
-export const SelectableItem: React.FC<SelectableItemProps> = selectableItem(
+export const SelectableItem = selectableItem<SelectableItemProps>(
   ({
     className = 'selectable-item',
     selectedClassName = 'selected',

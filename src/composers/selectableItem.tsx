@@ -8,10 +8,16 @@ import { isItemIntersected, mergeUnsubFns, useShallowState } from '../utils'
 // TODO: Should be configurable by user's options?
 const TOGGLE_ON_CLICK_TRESHOLD = 5
 
-export function selectableItem<T extends React.FC<any>>(Comp: T): T {
+export interface SelectableItemComponentProps {
+  // Leave empty for now
+}
+
+export function selectableItem<P>(
+  Comp: React.ComponentType<P>
+): React.FC<P & SelectableItemComponentProps> {
   const AnyComp = Comp as any
 
-  const Result: React.FC<any> = ({ ...props }) => {
+  return ({ ...props }) => {
     const { areaRef, events, options } = useSelectableArea()
 
     const itemRef = useRef<Element | null>(null)
@@ -95,6 +101,4 @@ export function selectableItem<T extends React.FC<any>>(Comp: T): T {
       </SelectableItemContext.Provider>
     )
   }
-
-  return Result as T
 }

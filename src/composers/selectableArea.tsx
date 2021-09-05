@@ -36,19 +36,15 @@ export interface SelectableAreaComponentProps {
   onSelectionEnd?: (selection: SelectionEvent) => void
 }
 
-export type SelectableAreaComponent<T> = T extends React.ComponentType<
-  infer Props
->
-  ? React.FC<Props & SelectableAreaComponentProps>
-  : never
-
 const noop = () => {}
 const EMPTY_OPTIONS: SelectableAreaOptions = {}
 
-export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
+export function selectableArea<P>(
+  Comp: React.ComponentType<P>
+): React.FC<P & SelectableAreaComponentProps> {
   const AnyComp = Comp as any
 
-  const Result: React.FC<SelectableAreaComponentProps> = ({
+  return ({
     options = EMPTY_OPTIONS,
     onSelectionStart = noop,
     onSelectionChange = noop,
@@ -157,6 +153,4 @@ export function selectableArea<T>(Comp: T): SelectableAreaComponent<T> {
       </SelectableAreaContext.Provider>
     )
   }
-
-  return Result as any
 }
