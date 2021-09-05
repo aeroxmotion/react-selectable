@@ -2,19 +2,17 @@ import React, { useRef, useMemo, useEffect } from 'react'
 
 import {
   SelectableAreaContextValue,
-  SelectionBoxObject,
   SelectableAreaContext,
   SelectableAreaOptions,
-  SelectionEvent,
-  SelectedItemEvent,
 } from '../contexts/SelectableAreaContext'
 import { EventEmitter } from '../EventEmitter'
 import {
   getRelativeCoordinates,
   guardMouseHandler,
   mergeUnsubFns,
-  MouseEventHandler,
 } from '../utils'
+import type { SelectionEvent, SelectedItemEvent } from '../EventEmitter'
+import type { SelectionBoxObject, MouseEventHandler } from '../sharedTypes'
 
 export interface SelectableAreaComponentProps {
   /**

@@ -1,19 +1,18 @@
 import React, { useEffect, useMemo, useRef } from 'react'
 
-import type {
-  SelectedItemEvent,
-  SelectionEvent,
-} from '../contexts/SelectableAreaContext'
+import type { SelectionEvent, SelectedItemEvent } from '../EventEmitter'
 import { SelectableItemContext } from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
-import { isItemIntersected, mergeUnsubFns, useShallowState } from '../utils'
+import { useShallowState } from '../hooks/useShallowState'
+import { isItemIntersected, mergeUnsubFns } from '../utils'
+import type { SelectableElement } from '../sharedTypes'
 
 // TODO: Should be configurable by user's options?
 const TOGGLE_ON_CLICK_TRESHOLD = 5
 
 export interface SelectableItemComponentProps {
   /**
-   *
+   * TODO
    */
   selectableValue?: SelectedItemEvent['value']
 }
@@ -31,7 +30,7 @@ export function selectableItem<P>(
     const itemId = useMemo(() => ++currentItemId, [])
 
     const firstItemRender = useRef(true)
-    const itemRef = useRef<Element | null>(null)
+    const itemRef = useRef<SelectableElement | null>(null)
 
     const [state, updateState] = useShallowState(() => ({
       selected: false,

@@ -1,78 +1,7 @@
 import { createContext } from 'react'
 
-import type { EventEmitter } from '../EventEmitter'
-
-export type SelectableElement = HTMLElement | SVGElement
-
-export type SelectionEvent = {
-  originalEvent: MouseEvent
-  selectionBox: SelectionBoxObject
-}
-
-export type SelectedItemEvent = {
-  id: number
-  element: Element
-  value: any
-}
-
-export interface SelectableEvents {
-  /**
-   *
-   */
-  selectionStart: SelectionEvent
-
-  /**
-   *
-   */
-  selectionChange: SelectionEvent
-
-  /**
-   *
-   */
-  selectionEnd: SelectionEvent
-
-  /**
-   *
-   */
-  selectAll: void
-
-  /**
-   *
-   */
-  deselectAll: void
-
-  /**
-   *
-   */
-  selectedItem: SelectedItemEvent
-
-  /**
-   *
-   */
-  deselectedItem: SelectedItemEvent
-}
-
-export interface SelectionBoxObject {
-  /**
-   * x-position in px relative to `SelectableArea`'s container
-   */
-  readonly x: number
-
-  /**
-   * y-position in px relative to `SelectableArea`'s container
-   */
-  readonly y: number
-
-  /**
-   * Box width in px
-   */
-  readonly width: number
-
-  /**
-   * Box height in px
-   */
-  readonly height: number
-}
+import type { SelectableEventEmitter } from '../EventEmitter'
+import type { SelectableElement } from '../sharedTypes'
 
 export interface SelectableAreaOptions {
   /**
@@ -104,15 +33,15 @@ export interface SelectableAreaContextValue {
   /**
    * Selectable area's ref container
    */
-  readonly areaRef: React.MutableRefObject<HTMLElement | null>
+  readonly areaRef: React.MutableRefObject<SelectableElement | null>
 
   /**
    * Events manager
    */
-  readonly events: EventEmitter<SelectableEvents>
+  readonly events: SelectableEventEmitter
 
   /**
-   * TODO
+   * Passed options to `SelectableArea`'s component
    */
   readonly options: SelectableAreaOptions
 }

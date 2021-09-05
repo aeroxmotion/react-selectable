@@ -1,10 +1,12 @@
 import { createContext } from 'react'
 
+import type { SelectableElement } from '../sharedTypes'
+
 export interface SelectableItemContextValue {
   /**
    * Selectable item's ref container
    */
-  readonly itemRef: React.MutableRefObject<Element | null>
+  readonly itemRef: React.MutableRefObject<SelectableElement | null>
 
   /**
    * `true` when the item is selected

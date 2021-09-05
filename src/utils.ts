@@ -1,40 +1,5 @@
-import { useCallback, useState } from 'react'
-import type {
-  SelectableAreaOptions,
-  SelectionBoxObject,
-} from './contexts/SelectableAreaContext'
-
-type UpdateStateFn<S> = (
-  nextState: Partial<S> | ((prevState: S) => Partial<S>)
-) => void
-
-export function useShallowState<S extends object>(
-  initialState?: S | (() => S)
-): [S, UpdateStateFn<S>] {
-  const [state, setState] = useState<S>(initialState!)
-
-  const updateState: UpdateStateFn<S> = useCallback((nextState) => {
-    setState((prevState) => {
-      const nextStateObj =
-        typeof nextState === 'function' ? nextState(prevState) : nextState
-
-      const keys: Array<keyof S> = Object.keys(nextStateObj) as any
-
-      for (const key of keys) {
-        if (prevState[key] !== nextStateObj[key]) {
-          return {
-            ...prevState,
-            ...nextStateObj,
-          }
-        }
-      }
-
-      return prevState
-    })
-  }, [])
-
-  return [state, updateState]
-}
+import type { MouseEventHandler, SelectionBoxObject } from './sharedTypes'
+import type { SelectableAreaOptions } from './contexts/SelectableAreaContext'
 
 export const isItemIntersected = (
   $area: Element,
@@ -67,8 +32,6 @@ export const isItemIntersected = (
 
   return true
 }
-
-export type MouseEventHandler = (e: MouseEvent) => void
 
 export const guardMouseHandler = (
   ignore: SelectableAreaOptions['ignore'] | undefined,
