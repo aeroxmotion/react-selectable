@@ -2,18 +2,30 @@ import React from 'react'
 
 import { selectableArea } from '../composers/selectableArea'
 import { useSelectableArea } from '../hooks/useSelectableArea'
+import { useJoinClassNames } from '../utils'
 
 export interface SelectableAreaProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  // Leave empty for now
+  selectionEnabledClassName?: string
 }
 
 export const SelectableArea = selectableArea<SelectableAreaProps>(
-  ({ className = 'selectable-area', children, ...attributes }) => {
-    const { areaRef } = useSelectableArea()
+  ({
+    className = 'selectable-area',
+    selectionEnabledClassName = 'selection-enabled',
+    children,
+    ...attributes
+  }) => {
+    const { areaRef, options } = useSelectableArea()
 
     return (
-      <div className={className} {...attributes} ref={areaRef as any}>
+      <div
+        {...attributes}
+        ref={areaRef as any}
+        className={useJoinClassNames([
+          className,
+          options.selectionEnabled !== false && selectionEnabledClassName,
+        ])}>
         {children}
       </div>
     )

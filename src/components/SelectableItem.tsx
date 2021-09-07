@@ -3,6 +3,7 @@ import React from 'react'
 import { selectableItem } from '../composers/selectableItem'
 import { useSelectableItem } from '../hooks/useSelectableItem'
 import { SelectableItemContextValue } from '../contexts/SelectableItemContext'
+import { useJoinClassNames } from '../utils'
 
 export interface SelectableItemProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -22,17 +23,16 @@ export const SelectableItem = selectableItem<SelectableItemProps>(
     ...attributes
   }) => {
     const { itemId, itemRef, selecting, selected } = useSelectableItem()
-    const classNames = [
-      className,
-      selecting && selectingClassName,
-      selected && selectedClassName,
-    ]
 
     return (
       <div
         {...attributes}
         ref={itemRef as any}
-        className={classNames.filter(Boolean).join(' ')}>
+        className={useJoinClassNames([
+          className,
+          selecting && selectingClassName,
+          selected && selectedClassName,
+        ])}>
         {typeof children === 'function'
           ? children({ itemId, selected, selecting })
           : children}

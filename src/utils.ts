@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import type {
   MouseEventHandler,
@@ -98,3 +98,6 @@ export const mergeUnsubFns = (unsubFns: Array<() => void>) => () => {
     unsubFn()
   }
 }
+
+export const useJoinClassNames = (classNames: any[]) =>
+  useMemo(() => classNames.filter(Boolean).join(' '), classNames)
