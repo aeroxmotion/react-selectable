@@ -11,7 +11,7 @@ export interface SelectableItemProps
   selectingClassName?: string
   children?:
     | React.ReactNode
-    | ((item: Omit<SelectableItemContextValue, 'itemRef'>) => void)
+    | ((item: Omit<SelectableItemContextValue, 'itemRef'>) => React.ReactNode)
 }
 
 export const SelectableItem = selectableItem<SelectableItemProps>(

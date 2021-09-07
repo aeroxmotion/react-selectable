@@ -58,7 +58,21 @@ function App() {
 
       {items.map((item) => (
         <SelectableItem key={item.id} selectableValue={item.id}>
-          {item.text}
+          {({ selecting, selected }) => (
+            <>
+              <p>{item.text}</p>
+              {selecting && (
+                <p>
+                  <i>Selecting</i>
+                </p>
+              )}
+              {selected && (
+                <p>
+                  <strong>Selected</strong>
+                </p>
+              )}
+            </>
+          )}
         </SelectableItem>
       ))}
 
