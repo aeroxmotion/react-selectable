@@ -19,9 +19,10 @@ export interface SelectableAreaOptions {
    * Selection mode.
    *
    * 'shift': Add selected items on new selections
+   * 'alt': Alternate between already selected items
    * 'default' (no value): Only persists selected items from the last selection
    */
-  selectionMode?: 'shift'
+  selectionMode?: 'shift' | 'alt'
 
   /**
    * Set of CSS selectors to ignore elements on `mousedown`

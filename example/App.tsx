@@ -21,7 +21,10 @@ const items: any[] = mock({
   ]
 `
 
-const selectionModes: SelectableAreaOptions['selectionMode'][] = ['shift']
+const selectionModes: SelectableAreaOptions['selectionMode'][] = [
+  'shift',
+  'alt',
+]
 
 const logEvent = (name: string) => (e: any) => console.log(`[${name}]`, e)
 

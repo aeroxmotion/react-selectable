@@ -98,8 +98,11 @@ export function selectableItem<P>(
         updateState((prevState) => ({
           selecting: false,
           selected: isItemIntersected($area, $item, e.selectionBox)
-            ? !toggleOnClick || getToggleOnClick(prevState.selected)
-            : selectionMode === 'shift' && prevState.selected,
+            ? selectionMode === 'alt'
+              ? !prevState.selected // Toggle selection on alternate mode
+              : !toggleOnClick || getToggleOnClick(prevState.selected)
+            : (selectionMode === 'shift' || selectionMode === 'alt') &&
+              prevState.selected,
         }))
 
         startSelectionEventRef.current = null
