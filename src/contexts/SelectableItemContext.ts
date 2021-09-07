@@ -4,6 +4,11 @@ import type { SelectableElement } from '../sharedTypes'
 
 export interface SelectableItemContextValue {
   /**
+   * Selectable item's id. Useful for debugging purposes.
+   */
+  readonly itemId: number
+
+  /**
    * Selectable item's ref container
    */
   readonly itemRef: React.MutableRefObject<SelectableElement | null>

@@ -21,7 +21,7 @@ export const SelectableItem = selectableItem<SelectableItemProps>(
     children,
     ...attributes
   }) => {
-    const { itemRef, selecting, selected } = useSelectableItem()
+    const { itemId, itemRef, selecting, selected } = useSelectableItem()
     const classNames = [
       className,
       selecting && selectingClassName,
@@ -34,7 +34,7 @@ export const SelectableItem = selectableItem<SelectableItemProps>(
         ref={itemRef as any}
         className={classNames.filter(Boolean).join(' ')}>
         {typeof children === 'function'
-          ? children({ selected, selecting })
+          ? children({ itemId, selected, selecting })
           : children}
       </div>
     )

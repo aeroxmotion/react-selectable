@@ -126,6 +126,7 @@ export function selectableItem<P>(
     return (
       <SelectableItemContext.Provider
         value={{
+          itemId,
           itemRef,
           ...state,
         }}>
