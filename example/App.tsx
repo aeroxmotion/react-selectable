@@ -33,11 +33,14 @@ function App() {
     useState<SelectableAreaOptions['selectionMode']>()
   const [toggleOnClick, setToggleOnClick] = useState(true)
   const [selectionEnabled, setSelectionEnabled] = useState(true)
+  const [selectionCommands, setSelectionCommands] = useState(true)
 
   const toggleToggleOnClick = () =>
     setToggleOnClick((prevToggleOnClick) => !prevToggleOnClick)
   const toggleSelectionEnabled = () =>
     setSelectionEnabled((prevSelectionEnabled) => !prevSelectionEnabled)
+  const toggleSelectionCommands = () =>
+    setSelectionCommands((prevSelectionCommands) => !prevSelectionCommands)
 
   const handleSelectionModeOnChange: React.SelectHTMLAttributes<HTMLSelectElement>['onChange'] =
     (e) => {
@@ -49,6 +52,7 @@ function App() {
       options={{
         selectionEnabled,
         selectionMode,
+        selectionCommands,
         toggleOnClick,
         ignore: ['.fixed-buttons', '.fixed-buttons *'],
       }}
@@ -99,6 +103,10 @@ function App() {
 
         <button onClick={toggleSelectionEnabled}>
           Selection Enabled: {selectionEnabled ? 'ON' : 'OFF'}
+        </button>
+
+        <button onClick={toggleSelectionCommands}>
+          Selection Commands: {selectionCommands ? 'ON' : 'OFF'}
         </button>
       </div>
     </SelectableArea>

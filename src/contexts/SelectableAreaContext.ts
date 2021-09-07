@@ -25,6 +25,14 @@ export interface SelectableAreaOptions {
   selectionMode?: 'shift' | 'alt'
 
   /**
+   * Switch between selection mode's by using
+   * `shift` key to switch up to shift's selection mode and
+   * `alt` key to switch up to alt's selection mode while
+   * selecting items
+   */
+  selectionCommands?: boolean
+
+  /**
    * Set of CSS selectors to ignore elements on `mousedown`
    */
   ignore?: string[]

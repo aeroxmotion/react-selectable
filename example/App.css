@@ -51,7 +51,7 @@ body {
 
 .fixed-buttons {
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: repeat(4, auto);
   gap: 0.5em;
   position: fixed;
   bottom: 1em;

@@ -33,7 +33,7 @@ export function selectableItem<P>(
     const {
       areaRef,
       events,
-      options: { selectionMode, toggleOnClick },
+      options: { selectionMode, selectionCommands, toggleOnClick },
     } = useSelectableArea()
 
     const itemId = useMemo(() => ++currentItemId, [])
@@ -65,18 +65,27 @@ export function selectableItem<P>(
       const $area = ensureAreaRef(areaRef)
       const $item = ensureItemRef(itemRef)
 
+      let startSelectionMode = selectionMode
+
       const onSelectionStart = (e: SelectionEvent) => {
         startSelectionEventRef.current = e
-        onSelecting(e)
+
+        let shiftPressed = e.originalEvent.shiftKey
+
+        if ((shiftPressed || e.originalEvent.altKey) && selectionCommands) {
+          startSelectionMode = shiftPressed ? 'shift' : 'alt'
+        }
+
+        onSelectionChange(e)
       }
 
-      const onSelecting = (e: SelectionEvent) => {
+      const onSelectionChange = (e: SelectionEvent) => {
         updateState({
           selecting: isItemIntersected($area, $item, e.selectionBox),
         })
       }
 
-      const onSelected = (e: SelectionEvent) => {
+      const onSelectionEnd = (e: SelectionEvent) => {
         const {
           originalEvent: { target: startTarget },
         } = startSelectionEventRef.current!
@@ -98,14 +107,16 @@ export function selectableItem<P>(
         updateState((prevState) => ({
           selecting: false,
           selected: isItemIntersected($area, $item, e.selectionBox)
-            ? selectionMode === 'alt'
+            ? startSelectionMode === 'alt'
               ? !prevState.selected // Toggle selection on alternate mode
               : !toggleOnClick || getToggleOnClick(prevState.selected)
-            : (selectionMode === 'shift' || selectionMode === 'alt') &&
+            : (startSelectionMode === 'shift' ||
+                startSelectionMode === 'alt') &&
               prevState.selected,
         }))
 
         startSelectionEventRef.current = null
+        startSelectionMode = selectionMode
       }
 
       const onSelectAll = () => {
@@ -118,13 +129,13 @@ export function selectableItem<P>(
 
       return mergeUnsubFns([
         events.on('selectionStart', onSelectionStart),
-        events.on('selectionChange', onSelecting),
-        events.on('selectionEnd', onSelected),
+        events.on('selectionChange', onSelectionChange),
+        events.on('selectionEnd', onSelectionEnd),
 
         events.on('selectAll', onSelectAll),
         events.on('deselectAll', onDeselectAll),
       ])
-    }, [selectionMode, toggleOnClick])
+    }, [selectionMode, selectionCommands, toggleOnClick])
 
     return (
       <SelectableItemContext.Provider
