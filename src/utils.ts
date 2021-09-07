@@ -43,12 +43,7 @@ export const isItemIntersected = (
   selectionBox: SelectionBoxObject
 ) => {
   const itemRect = $item.getBoundingClientRect()
-  const areaRect = $area.getBoundingClientRect()
-
-  const itemCoordinates = {
-    x: itemRect.x - areaRect.x,
-    y: itemRect.y - areaRect.y,
-  }
+  const itemCoordinates = getRelativeCoordinatesToArea($area, itemRect)
 
   if (itemCoordinates.x + itemRect.width < selectionBox.x) {
     return false
@@ -81,12 +76,20 @@ export const guardMouseHandler = (
         }
       }
 
-export const getRelativeCoordinates = ($area: Element, e: MouseEvent) => {
+type Coordinates = {
+  x: number
+  y: number
+}
+
+export const getRelativeCoordinatesToArea = (
+  $area: Element,
+  coords: Coordinates
+): Coordinates => {
   const areaRect = $area.getBoundingClientRect()
 
   return {
-    x: e.clientX - areaRect.x,
-    y: e.clientY - areaRect.y,
+    x: coords.x - areaRect.x + $area.scrollLeft,
+    y: coords.y - areaRect.y + $area.scrollTop,
   }
 }
 

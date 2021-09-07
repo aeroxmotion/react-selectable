@@ -1,5 +1,9 @@
 body {
   margin: 0;
+  max-width: 100vw;
+  max-height: 100vh;
+
+  overflow: hidden;
 }
 
 .selectable-area {
@@ -12,6 +16,8 @@ body {
   position: relative;
 
   height: 100vh;
+
+  overflow: auto;
 }
 
 .selectable-item {

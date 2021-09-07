@@ -8,7 +8,7 @@ import {
 import { EventEmitter } from '../EventEmitter'
 import {
   EMPTY_OBJECT,
-  getRelativeCoordinates,
+  getRelativeCoordinatesToArea,
   guardMouseHandler,
   mergeUnsubFns,
   NOOP,
@@ -98,7 +98,7 @@ export function selectableArea<P>(
 
       const onMouseDown = guardMouseHandler(ignore, (e) => {
         const nextSelectionBox: SelectionBoxObject = {
-          ...getRelativeCoordinates($area, e),
+          ...getRelativeCoordinatesToArea($area, e),
           width: 0,
           height: 0,
         }
@@ -133,7 +133,7 @@ export function selectableArea<P>(
 
       const onMouseMove: MouseEventHandler = (e) => {
         const { current: startSelectionBox } = startSelectionBoxRef
-        const { x, y } = getRelativeCoordinates($area, e)
+        const { x, y } = getRelativeCoordinatesToArea($area, e)
 
         const nextSelectionBox: SelectionBoxObject = {
           x: Math.min(startSelectionBox!.x, x),
