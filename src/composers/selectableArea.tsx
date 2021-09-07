@@ -7,12 +7,19 @@ import {
 } from '../contexts/SelectableAreaContext'
 import { EventEmitter } from '../EventEmitter'
 import {
+  EMPTY_OBJECT,
   getRelativeCoordinates,
   guardMouseHandler,
   mergeUnsubFns,
+  NOOP,
+  ensureAreaRef,
 } from '../utils'
 import type { SelectionEvent, SelectedItemEvent } from '../EventEmitter'
-import type { SelectionBoxObject, MouseEventHandler } from '../sharedTypes'
+import type {
+  SelectionBoxObject,
+  MouseEventHandler,
+  SelectableElement,
+} from '../sharedTypes'
 
 export interface SelectableAreaComponentProps {
   /**
@@ -46,26 +53,23 @@ export interface SelectableAreaComponentProps {
   onDeselectedItem?: (deselected: SelectedItemEvent) => void
 }
 
-const noop = () => {}
-const EMPTY_OPTIONS: SelectableAreaOptions = {}
-
 export function selectableArea<P>(
   Comp: React.ComponentType<P>
 ): React.FC<P & SelectableAreaComponentProps> {
   const AnyComp = Comp as any
 
   return ({
-    options = EMPTY_OPTIONS,
-    onSelectionStart = noop,
-    onSelectionChange = noop,
-    onSelectionEnd = noop,
-    onSelectedItem = noop,
-    onDeselectedItem = noop,
+    options = EMPTY_OBJECT as SelectableAreaOptions,
+    onSelectionStart = NOOP,
+    onSelectionChange = NOOP,
+    onSelectionEnd = NOOP,
+    onSelectedItem = NOOP,
+    onDeselectedItem = NOOP,
     ...props
   }) => {
     const { selectionEnabled, ignore } = options
 
-    const areaRef = useRef<HTMLElement | null>(null)
+    const areaRef = useRef<SelectableElement>(null)
     const startSelectionBoxRef = useRef<SelectionBoxObject | null>(null)
     const selectionBoxRef = useRef<SelectionBoxObject | null>(null)
 
@@ -89,7 +93,8 @@ export function selectableArea<P>(
         return
       }
 
-      const $area = areaRef.current!
+      // Use as HTMLElement so we can listen to mouse events
+      const $area = ensureAreaRef(areaRef) as HTMLElement
 
       const onMouseDown = guardMouseHandler(ignore, (e) => {
         const nextSelectionBox: SelectionBoxObject = {
@@ -123,8 +128,8 @@ export function selectableArea<P>(
         events.trigger('selectionEnd', selectionEvent)
         startSelectionBoxRef.current = selectionBoxRef.current = null
 
-        $area!.removeEventListener('mouseup', onMouseUp)
-        $area!.removeEventListener('mousemove', onMouseMove)
+        $area.removeEventListener('mouseup', onMouseUp)
+        $area.removeEventListener('mousemove', onMouseMove)
       }
 
       const onMouseMove: MouseEventHandler = (e) => {
@@ -148,14 +153,14 @@ export function selectableArea<P>(
         events.trigger('selectionChange', selectionEvent)
       }
 
-      $area!.addEventListener('mousedown', onMouseDown)
+      $area.addEventListener('mousedown', onMouseDown)
 
       return () => {
-        $area!.removeEventListener('mousedown', onMouseDown)
-        $area!.removeEventListener('mouseup', onMouseUp)
+        $area.removeEventListener('mousedown', onMouseDown)
+        $area.removeEventListener('mouseup', onMouseUp)
 
         // Whether the component is unmount during `mousemove`
-        $area!.removeEventListener('mousemove', onMouseMove)
+        $area.removeEventListener('mousemove', onMouseMove)
       }
     }, [
       // Options

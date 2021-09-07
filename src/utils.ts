@@ -1,5 +1,41 @@
-import type { MouseEventHandler, SelectionBoxObject } from './sharedTypes'
+import React from 'react'
+
+import type {
+  MouseEventHandler,
+  SelectableElement,
+  SelectionBoxObject,
+} from './sharedTypes'
 import type { SelectableAreaOptions } from './contexts/SelectableAreaContext'
+
+export const NOOP = () => {}
+export const EMPTY_OBJECT = {}
+
+const warnOnRefs = new WeakSet<React.MutableRefObject<any>>()
+
+export const ensureRef = (
+  debugIdent: string,
+  ref: React.MutableRefObject<SelectableElement | null>
+): SelectableElement => {
+  let el = ref.current!
+
+  // Check and save the ref, so we don't have to throw the same error again
+  if (el != null || warnOnRefs.has(ref)) {
+    return el
+  }
+
+  warnOnRefs.add(ref)
+
+  console.error(
+    `[ReactSelectable] Missing ref for \`${debugIdent}\`.\n\n` +
+      `Tip: Make sure you do \`${debugIdent}.current = ref\` or \`<Comp ref={${debugIdent}} />\` ` +
+      'and set a non-nullable value as ref'
+  )
+
+  return el
+}
+
+export const ensureAreaRef = ensureRef.bind(null, 'areaRef')
+export const ensureItemRef = ensureRef.bind(null, 'itemRef')
 
 export const isItemIntersected = (
   $area: Element,

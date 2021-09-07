@@ -4,7 +4,12 @@ import type { SelectionEvent, SelectedItemEvent } from '../EventEmitter'
 import { SelectableItemContext } from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
 import { useShallowState } from '../hooks/useShallowState'
-import { isItemIntersected, mergeUnsubFns } from '../utils'
+import {
+  ensureAreaRef,
+  ensureItemRef,
+  isItemIntersected,
+  mergeUnsubFns,
+} from '../utils'
 import type { SelectableElement } from '../sharedTypes'
 
 // TODO: Should be configurable by user's options?
@@ -25,11 +30,16 @@ export function selectableItem<P>(
   const AnyComp = Comp as any
 
   return ({ selectableValue, ...props }) => {
-    const { areaRef, events, options } = useSelectableArea()
+    const {
+      areaRef,
+      events,
+      options: { selectionMode, toggleOnClick },
+    } = useSelectableArea()
 
     const itemId = useMemo(() => ++currentItemId, [])
 
     const firstItemRender = useRef(true)
+    const startSelectionEventRef = useRef<SelectionEvent | null>(null)
     const itemRef = useRef<SelectableElement | null>(null)
 
     const [state, updateState] = useShallowState(() => ({
@@ -52,13 +62,11 @@ export function selectableItem<P>(
     }, [state.selected])
 
     useEffect(() => {
-      const $area = areaRef.current!
-      const $item = itemRef.current!
-
-      let selectionStartEvent: SelectionEvent | null = null
+      const $area = ensureAreaRef(areaRef)
+      const $item = ensureItemRef(itemRef)
 
       const onSelectionStart = (e: SelectionEvent) => {
-        selectionStartEvent = e
+        startSelectionEventRef.current = e
         onSelecting(e)
       }
 
@@ -71,7 +79,7 @@ export function selectableItem<P>(
       const onSelected = (e: SelectionEvent) => {
         const {
           originalEvent: { target: startTarget },
-        } = selectionStartEvent!
+        } = startSelectionEventRef.current!
         const {
           originalEvent: { target: endTarget },
           selectionBox: endSelectionBox,
@@ -90,11 +98,11 @@ export function selectableItem<P>(
         updateState((prevState) => ({
           selecting: false,
           selected: isItemIntersected($area, $item, e.selectionBox)
-            ? !options.toggleOnClick || getToggleOnClick(prevState.selected)
-            : options.selectionMode === 'shift' && prevState.selected,
+            ? !toggleOnClick || getToggleOnClick(prevState.selected)
+            : selectionMode === 'shift' && prevState.selected,
         }))
 
-        selectionStartEvent = null
+        startSelectionEventRef.current = null
       }
 
       const onSelectAll = () => {
@@ -113,7 +121,7 @@ export function selectableItem<P>(
         events.on('selectAll', onSelectAll),
         events.on('deselectAll', onDeselectAll),
       ])
-    }, [options.selectionMode, options.toggleOnClick])
+    }, [selectionMode, toggleOnClick])
 
     return (
       <SelectableItemContext.Provider

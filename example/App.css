@@ -43,6 +43,9 @@ body {
 }
 
 .fixed-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 0.5em;
   position: fixed;
   bottom: 1em;
   right: 1em;
