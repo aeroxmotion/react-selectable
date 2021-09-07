@@ -114,8 +114,8 @@ export function selectableArea<P>(
         onSelectionStart(selectionEvent)
         events.trigger('selectionStart', selectionEvent)
 
-        $area!.addEventListener('mouseup', onMouseUp)
-        $area!.addEventListener('mousemove', onMouseMove)
+        document.addEventListener('mouseup', onMouseUp)
+        document.addEventListener('mousemove', onMouseMove)
       })
 
       const onMouseUp: MouseEventHandler = (e) => {
@@ -128,8 +128,7 @@ export function selectableArea<P>(
         events.trigger('selectionEnd', selectionEvent)
         startSelectionBoxRef.current = selectionBoxRef.current = null
 
-        $area.removeEventListener('mouseup', onMouseUp)
-        $area.removeEventListener('mousemove', onMouseMove)
+        removeMousedownCreatedEvents()
       }
 
       const onMouseMove: MouseEventHandler = (e) => {
@@ -153,14 +152,18 @@ export function selectableArea<P>(
         events.trigger('selectionChange', selectionEvent)
       }
 
-      $area.addEventListener('mousedown', onMouseDown)
+      document.addEventListener('mousedown', onMouseDown)
+
+      const removeMousedownCreatedEvents = () => {
+        document.removeEventListener('mouseup', onMouseUp)
+        document.removeEventListener('mousemove', onMouseMove)
+      }
 
       return () => {
-        $area.removeEventListener('mousedown', onMouseDown)
-        $area.removeEventListener('mouseup', onMouseUp)
+        document.removeEventListener('mousedown', onMouseDown)
 
         // Whether the component is unmount during `mousemove`
-        $area.removeEventListener('mousemove', onMouseMove)
+        removeMousedownCreatedEvents()
       }
     }, [
       // Options
