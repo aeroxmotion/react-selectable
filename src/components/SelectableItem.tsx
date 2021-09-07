@@ -1,8 +1,8 @@
 import React from 'react'
 
+import type { SelectableItemContextValue } from '../contexts/SelectableItemContext'
 import { selectableItem } from '../composers/selectableItem'
 import { useSelectableItem } from '../hooks/useSelectableItem'
-import { SelectableItemContextValue } from '../contexts/SelectableItemContext'
 import { useJoinClassNames } from '../utils'
 
 export interface SelectableItemProps

@@ -1,5 +1,6 @@
 import React from 'react'
 
+import type { SelectableAreaContextValue } from '../contexts/SelectableAreaContext'
 import { selectableArea } from '../composers/selectableArea'
 import { useSelectableArea } from '../hooks/useSelectableArea'
 import { useJoinClassNames } from '../utils'
@@ -7,6 +8,9 @@ import { useJoinClassNames } from '../utils'
 export interface SelectableAreaProps
   extends React.HTMLAttributes<HTMLDivElement> {
   selectionEnabledClassName?: string
+  children?:
+    | React.ReactNode
+    | ((area: Omit<SelectableAreaContextValue, 'areaRef'>) => React.ReactNode)
 }
 
 export const SelectableArea = selectableArea<SelectableAreaProps>(
@@ -16,7 +20,7 @@ export const SelectableArea = selectableArea<SelectableAreaProps>(
     children,
     ...attributes
   }) => {
-    const { areaRef, options } = useSelectableArea()
+    const { areaRef, events, options } = useSelectableArea()
 
     return (
       <div
@@ -26,7 +30,9 @@ export const SelectableArea = selectableArea<SelectableAreaProps>(
           className,
           options.selectionEnabled !== false && selectionEnabledClassName,
         ])}>
-        {children}
+        {typeof children === 'function'
+          ? children({ events, options })
+          : children}
       </div>
     )
   }
