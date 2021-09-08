@@ -49,6 +49,7 @@ function App() {
 
   return (
     <SelectableArea
+      tag="section"
       options={{
         selectionEnabled,
         selectionMode,
@@ -64,7 +65,7 @@ function App() {
       <SelectionBox />
 
       {items.map((item) => (
-        <SelectableItem key={item.id} selectableValue={item.id}>
+        <SelectableItem tag="article" key={item.id} selectableValue={item.id}>
           {({ selecting, selected }) => (
             <>
               <p>{item.text}</p>

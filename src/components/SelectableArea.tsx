@@ -7,6 +7,7 @@ import { useJoinClassNames } from '../utils'
 
 export interface SelectableAreaProps
   extends React.HTMLAttributes<HTMLDivElement> {
+  tag?: keyof HTMLElementTagNameMap
   selectionEnabledClassName?: string
   children?:
     | React.ReactNode
@@ -15,6 +16,7 @@ export interface SelectableAreaProps
 
 export const SelectableArea = selectableArea<SelectableAreaProps>(
   ({
+    tag = 'div',
     className = 'selectable-area',
     selectionEnabledClassName = 'selection-enabled',
     children,
@@ -22,18 +24,17 @@ export const SelectableArea = selectableArea<SelectableAreaProps>(
   }) => {
     const { areaRef, events, options } = useSelectableArea()
 
-    return (
-      <div
-        {...attributes}
-        ref={areaRef as any}
-        className={useJoinClassNames([
+    return React.createElement(
+      tag,
+      {
+        ...attributes,
+        ref: areaRef,
+        className: useJoinClassNames([
           className,
           options.selectionEnabled !== false && selectionEnabledClassName,
-        ])}>
-        {typeof children === 'function'
-          ? children({ events, options })
-          : children}
-      </div>
+        ]),
+      },
+      typeof children === 'function' ? children({ events, options }) : children
     )
   }
 )

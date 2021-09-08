@@ -5,8 +5,8 @@ import { selectableItem } from '../composers/selectableItem'
 import { useSelectableItem } from '../hooks/useSelectableItem'
 import { useJoinClassNames } from '../utils'
 
-export interface SelectableItemProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface SelectableItemProps extends React.HTMLAttributes<HTMLElement> {
+  tag?: keyof HTMLElementTagNameMap
   selectedClassName?: string
   selectingClassName?: string
   children?:
@@ -16,6 +16,7 @@ export interface SelectableItemProps
 
 export const SelectableItem = selectableItem<SelectableItemProps>(
   ({
+    tag = 'div',
     className = 'selectable-item',
     selectedClassName = 'selected',
     selectingClassName = 'selecting',
@@ -24,19 +25,20 @@ export const SelectableItem = selectableItem<SelectableItemProps>(
   }) => {
     const { itemId, itemRef, selecting, selected } = useSelectableItem()
 
-    return (
-      <div
-        {...attributes}
-        ref={itemRef as any}
-        className={useJoinClassNames([
+    return React.createElement(
+      tag,
+      {
+        ...attributes,
+        ref: itemRef,
+        className: useJoinClassNames([
           className,
           selecting && selectingClassName,
           selected && selectedClassName,
-        ])}>
-        {typeof children === 'function'
-          ? children({ itemId, selected, selecting })
-          : children}
-      </div>
+        ]),
+      },
+      typeof children === 'function'
+        ? children({ itemId, selected, selecting })
+        : children
     )
   }
 )
