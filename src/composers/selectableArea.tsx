@@ -81,10 +81,19 @@ export function selectableArea<P>(
     useEffect(
       () =>
         mergeUnsubFns([
+          events.on('selectionStart', onSelectionStart),
+          events.on('selectionChange', onSelectionChange),
+          events.on('selectionEnd', onSelectionEnd),
           events.on('selectedItem', onSelectedItem),
           events.on('deselectedItem', onDeselectedItem),
         ]),
-      [onSelectedItem, onDeselectedItem]
+      [
+        onSelectionStart,
+        onSelectionChange,
+        onSelectionEnd,
+        onSelectedItem,
+        onDeselectedItem,
+      ]
     )
 
     useEffect(() => {
@@ -103,15 +112,13 @@ export function selectableArea<P>(
           height: 0,
         }
 
-        startSelectionBoxRef.current = selectionBoxRef.current =
-          nextSelectionBox
-
         const selectionEvent: SelectionEvent = {
           originalEvent: e,
           selectionBox: nextSelectionBox,
         }
 
-        onSelectionStart(selectionEvent)
+        startSelectionBoxRef.current = selectionBoxRef.current =
+          nextSelectionBox
         events.trigger('selectionStart', selectionEvent)
 
         document.addEventListener('mouseup', onMouseUp)
@@ -124,9 +131,8 @@ export function selectableArea<P>(
           selectionBox: selectionBoxRef.current!,
         }
 
-        onSelectionEnd(selectionEvent)
-        events.trigger('selectionEnd', selectionEvent)
         startSelectionBoxRef.current = selectionBoxRef.current = null
+        events.trigger('selectionEnd', selectionEvent)
 
         removeMousedownCreatedEvents()
       }
@@ -147,7 +153,6 @@ export function selectableArea<P>(
           selectionBox: nextSelectionBox,
         }
 
-        onSelectionChange(selectionEvent)
         selectionBoxRef.current = nextSelectionBox
         events.trigger('selectionChange', selectionEvent)
       }

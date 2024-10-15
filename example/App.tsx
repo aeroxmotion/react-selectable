@@ -22,6 +22,7 @@ const items: any[] = mock({
 `
 
 const selectionModes: SelectableAreaOptions['selectionMode'][] = [
+  void 0, // <- default
   'shift',
   'alt',
 ]
@@ -85,18 +86,13 @@ function App() {
       ))}
 
       <div className="fixed-buttons">
-        <span>
-          Selection Mode:
-          <select onChange={handleSelectionModeOnChange} value={selectionMode}>
-            <option value={undefined}>default</option>
-
-            {selectionModes.map((mode) => (
-              <option key={mode} value={mode}>
-                {mode}
-              </option>
-            ))}
-          </select>
-        </span>
+        <select onChange={handleSelectionModeOnChange} value={selectionMode}>
+          {selectionModes.map((mode) => (
+            <option key={mode ?? 'default'} value={mode}>
+              Selection Mode: {mode ?? 'default'}
+            </option>
+          ))}
+        </select>
 
         <button onClick={toggleToggleOnClick}>
           Toggle On Click: {toggleOnClick ? 'ON' : 'OFF'}

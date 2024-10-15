@@ -71,12 +71,13 @@ export interface SelectableEvents {
 }
 
 export type SelectableEventEmitter = EventEmitter<SelectableEvents>
+export type EventEmitterListener<T> = (detail: T) => void
 
 export class EventEmitter<T extends EventMapping> extends Map<
   keyof T,
   Set<(event: T[keyof T]) => void>
 > {
-  on<K extends keyof T>(eventName: K, listener: (event: T[K]) => void) {
+  on<K extends keyof T>(eventName: K, listener: EventEmitterListener<T[K]>) {
     let listeners = super.get(eventName)
 
     if (!listeners) {
@@ -94,11 +95,22 @@ export class EventEmitter<T extends EventMapping> extends Map<
     }
   }
 
-  trigger<K extends keyof T>(eventName: K, detail?: T[K]) {
+  once<K extends keyof T>(eventName: K, listener: EventEmitterListener<T[K]>) {
+    const off = this.on(eventName, (detail) => {
+      off()
+      listener(detail)
+    })
+
+    return off
+  }
+
+  trigger<K extends keyof T>(eventName: K, detail: T[K]) {
     const listeners = super.get(eventName)
 
     if (listeners) {
-      listeners.forEach((listener) => listener(detail!))
+      for (const listener of listeners) {
+        listener(detail)
+      }
     }
   }
 }

@@ -8,12 +8,12 @@ export interface SelectableAreaOptions {
    * Toggle `selected` item. Useful in conjunction
    * with shift's selection mode
    */
-  toggleOnClick?: boolean
+  readonly toggleOnClick?: boolean
 
   /**
    * When `true` selection is enabled
    */
-  selectionEnabled?: boolean
+  readonly selectionEnabled?: boolean
 
   /**
    * Selection mode.
@@ -22,7 +22,7 @@ export interface SelectableAreaOptions {
    * 'alt': Alternate between already selected items
    * 'default' (no value): Only persists selected items from the last selection
    */
-  selectionMode?: 'shift' | 'alt'
+  readonly selectionMode?: 'shift' | 'alt'
 
   /**
    * Switch between selection mode's by using
@@ -30,12 +30,12 @@ export interface SelectableAreaOptions {
    * `alt` key to switch up to alt's selection mode while
    * selecting items
    */
-  selectionCommands?: boolean
+  readonly selectionCommands?: boolean
 
   /**
    * Set of CSS selectors to ignore elements on `mousedown`
    */
-  ignore?: string[]
+  readonly ignore?: string[]
 }
 
 export interface SelectableAreaContextValue {
