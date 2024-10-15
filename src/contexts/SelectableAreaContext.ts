@@ -1,7 +1,7 @@
 import { createContext } from 'react'
 
-import type { SelectableEventEmitter } from '../EventEmitter'
-import type { SelectableElement } from '../sharedTypes'
+import { type SelectableEventEmitter } from '../events/EventEmitter'
+import { type SelectableElement } from '../sharedTypes'
 
 export interface SelectableAreaOptions {
   /**

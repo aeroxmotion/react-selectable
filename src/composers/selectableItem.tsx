@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react'
 
-import type { SelectionEvent, SelectedItemEvent } from '../EventEmitter'
+import { type SelectionEvent, type SelectedItemEvent } from '../events/types'
 import { SelectableItemContext } from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
 import { useShallowState } from '../hooks/useShallowState'

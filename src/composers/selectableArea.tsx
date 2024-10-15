@@ -5,7 +5,8 @@ import {
   SelectableAreaContext,
   SelectableAreaOptions,
 } from '../contexts/SelectableAreaContext'
-import { EventEmitter } from '../EventEmitter'
+import { EventEmitter } from '../events/EventEmitter'
+import { type SelectionEvent, type SelectedItemEvent } from '../events/types'
 import {
   EMPTY_OBJECT,
   getRelativeCoordinatesToArea,
@@ -14,11 +15,10 @@ import {
   NOOP,
   ensureAreaRef,
 } from '../utils'
-import type { SelectionEvent, SelectedItemEvent } from '../EventEmitter'
-import type {
-  SelectionBoxObject,
-  MouseEventHandler,
-  SelectableElement,
+import {
+  type SelectionBoxObject,
+  type MouseEventHandler,
+  type SelectableElement,
 } from '../sharedTypes'
 
 export interface SelectableAreaComponentProps {

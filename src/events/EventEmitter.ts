@@ -1,77 +1,10 @@
-import type { SelectionBoxObject } from './sharedTypes'
-
-export type EventMapping = {
-  [eventName: string]: any
-}
-
-export type SelectionEvent = {
-  /**
-   *
-   */
-  originalEvent: MouseEvent
-
-  /**
-   *
-   */
-  selectionBox: SelectionBoxObject
-}
-
-export type SelectedItemEvent = {
-  /**
-   *
-   */
-  id: number
-
-  /**
-   *
-   */
-  element: Element
-
-  /**
-   *
-   */
-  value: any
-}
-
-export interface SelectableEvents {
-  /**
-   *
-   */
-  selectionStart: SelectionEvent
-
-  /**
-   *
-   */
-  selectionChange: SelectionEvent
-
-  /**
-   *
-   */
-  selectionEnd: SelectionEvent
-
-  /**
-   *
-   */
-  selectAll: void
-
-  /**
-   *
-   */
-  deselectAll: void
-
-  /**
-   *
-   */
-  selectedItem: SelectedItemEvent
-
-  /**
-   *
-   */
-  deselectedItem: SelectedItemEvent
-}
+import {
+  type EventMapping,
+  type SelectableEvents,
+  type EventEmitterListener,
+} from './types'
 
 export type SelectableEventEmitter = EventEmitter<SelectableEvents>
-export type EventEmitterListener<T> = (detail: T) => void
 
 export class EventEmitter<T extends EventMapping> extends Map<
   keyof T,

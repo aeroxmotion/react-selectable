@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 
 import { useSelectableArea } from './useSelectableArea'
-import type { SelectionBoxObject } from '../sharedTypes'
-import type { SelectionEvent } from '../EventEmitter'
+import { type SelectionBoxObject } from '../sharedTypes'
+import { type SelectionEvent } from '../events/types'
 import { mergeUnsubFns } from '../utils'
 
 export const useSelectionBox = () => {

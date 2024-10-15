@@ -27,4 +27,4 @@ export * from './hooks/useSelectionBox'
 /**
  * Expose `EventEmitter` types
  */
-export * from './EventEmitter'
+export * from './events/EventEmitter'
