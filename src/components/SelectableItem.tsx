@@ -5,21 +5,37 @@ import { createSelectableItem } from '../composers/selectableItem'
 import { useSelectableItem } from '../hooks/useSelectableItem'
 import { useJoinClassNames } from '../utils'
 
+export type SelectableItemClassNames = {
+  /**
+   *
+   */
+  selected?: string
+
+  /**
+   *
+   */
+  selecting?: string
+}
+
 export interface SelectableItemProps extends React.HTMLAttributes<HTMLElement> {
   tag?: keyof HTMLElementTagNameMap
-  selectedClassName?: string
-  selectingClassName?: string
+  classNames?: SelectableItemClassNames
   children?:
     | React.ReactNode
     | ((item: Omit<SelectableItemContextValue, 'itemRef'>) => React.ReactNode)
 }
 
+const DEFAULT_SELECTABLE_ITEM_CLASS_NAMES: Required<SelectableItemClassNames> =
+  {
+    selected: 'selected',
+    selecting: 'selecting',
+  }
+
 const BaseSelectableItem = createSelectableItem<SelectableItemProps>(
   ({
     tag = 'div',
     className = 'selectable-item',
-    selectedClassName = 'selected',
-    selectingClassName = 'selecting',
+    classNames = DEFAULT_SELECTABLE_ITEM_CLASS_NAMES,
     children,
     ...attributes
   }) => {
@@ -32,8 +48,8 @@ const BaseSelectableItem = createSelectableItem<SelectableItemProps>(
         ref: itemRef,
         className: useJoinClassNames([
           className,
-          selecting && selectingClassName,
-          selected && selectedClassName,
+          selecting && classNames.selecting,
+          selected && classNames.selected,
         ]),
       },
       typeof children === 'function'
