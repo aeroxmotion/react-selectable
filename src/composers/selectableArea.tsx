@@ -53,7 +53,7 @@ export interface SelectableAreaComponentProps {
   onDeselectedItem?: (deselected: SelectedItemEvent) => void
 }
 
-export function selectableArea<P>(
+export function createSelectableArea<P>(
   Comp: React.ComponentType<P>
 ): React.FC<P & SelectableAreaComponentProps> {
   const AnyComp = Comp as any

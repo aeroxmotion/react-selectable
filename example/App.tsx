@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useReducer, useState } from 'react'
 import { mock } from '@mockpiler/compiler'
 
 import {
@@ -9,14 +9,11 @@ import {
 } from '../src'
 import './App.css'
 
-const items: any[] = mock({
-  id: Math.random,
-  text: 'Hey!',
-})`
+const items: any[] = mock`
   [
     (25) {
-      id
-      text
+      id: ${Math.random}
+      text: ${'Hey'}
     }
   ]
 `
@@ -32,16 +29,18 @@ const logEvent = (name: string) => (e: any) => console.log(`[${name}]`, e)
 function App() {
   const [selectionMode, setSelectionMode] =
     useState<SelectableAreaOptions['selectionMode']>()
-  const [toggleOnClick, setToggleOnClick] = useState(true)
-  const [selectionEnabled, setSelectionEnabled] = useState(true)
-  const [selectionCommands, setSelectionCommands] = useState(true)
-
-  const toggleToggleOnClick = () =>
-    setToggleOnClick((prevToggleOnClick) => !prevToggleOnClick)
-  const toggleSelectionEnabled = () =>
-    setSelectionEnabled((prevSelectionEnabled) => !prevSelectionEnabled)
-  const toggleSelectionCommands = () =>
-    setSelectionCommands((prevSelectionCommands) => !prevSelectionCommands)
+  const [toggleOnClick, toggleToggleOnClick] = useReducer(
+    (state) => !state,
+    true
+  )
+  const [selectionEnabled, toggleSelectionEnabled] = useReducer(
+    (state) => !state,
+    true
+  )
+  const [selectionCommands, toggleSelectionCommands] = useReducer(
+    (state) => !state,
+    true
+  )
 
   const handleSelectionModeOnChange: React.SelectHTMLAttributes<HTMLSelectElement>['onChange'] =
     (e) => {

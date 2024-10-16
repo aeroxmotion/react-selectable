@@ -24,7 +24,7 @@ export interface SelectableItemComponentProps {
 
 let currentItemId = 0
 
-export function selectableItem<P>(
+export function createSelectableItem<P>(
   Comp: React.ComponentType<P>
 ): React.FC<P & SelectableItemComponentProps> {
   const AnyComp = Comp as any

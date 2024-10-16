@@ -1,7 +1,7 @@
 import React from 'react'
 
 import type { SelectableAreaContextValue } from '../contexts/SelectableAreaContext'
-import { selectableArea } from '../composers/selectableArea'
+import { createSelectableArea } from '../composers/selectableArea'
 import { useSelectableArea } from '../hooks/useSelectableArea'
 import { useJoinClassNames } from '../utils'
 
@@ -14,7 +14,7 @@ export interface SelectableAreaProps
     | ((area: Omit<SelectableAreaContextValue, 'areaRef'>) => React.ReactNode)
 }
 
-export const SelectableArea = selectableArea<SelectableAreaProps>(
+export const SelectableArea = createSelectableArea<SelectableAreaProps>(
   ({
     tag = 'div',
     className = 'selectable-area',
