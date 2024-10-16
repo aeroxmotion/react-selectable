@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import { useSelectionBox } from '../hooks/useSelectionBox'
 
@@ -7,7 +7,7 @@ export interface SelectionBoxProps
   // Leave empty for now
 }
 
-export const SelectionBox: React.FC<SelectionBoxProps> = ({
+const BaseSelectionBox: React.FC<SelectionBoxProps> = ({
   className = 'selection-box',
   ...attributes
 }) => {
@@ -29,3 +29,5 @@ export const SelectionBox: React.FC<SelectionBoxProps> = ({
     )
   )
 }
+
+export const SelectionBox = memo(BaseSelectionBox)

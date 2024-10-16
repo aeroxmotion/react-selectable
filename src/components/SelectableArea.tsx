@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import type { SelectableAreaContextValue } from '../contexts/SelectableAreaContext'
 import { createSelectableArea } from '../composers/selectableArea'
@@ -14,7 +14,7 @@ export interface SelectableAreaProps
     | ((area: Omit<SelectableAreaContextValue, 'areaRef'>) => React.ReactNode)
 }
 
-export const SelectableArea = createSelectableArea<SelectableAreaProps>(
+const BaseSelectableArea = createSelectableArea<SelectableAreaProps>(
   ({
     tag = 'div',
     className = 'selectable-area',
@@ -38,3 +38,5 @@ export const SelectableArea = createSelectableArea<SelectableAreaProps>(
     )
   }
 )
+
+export const SelectableArea = memo(BaseSelectableArea)

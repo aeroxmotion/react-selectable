@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import type { SelectableItemContextValue } from '../contexts/SelectableItemContext'
 import { createSelectableItem } from '../composers/selectableItem'
@@ -14,7 +14,7 @@ export interface SelectableItemProps extends React.HTMLAttributes<HTMLElement> {
     | ((item: Omit<SelectableItemContextValue, 'itemRef'>) => React.ReactNode)
 }
 
-export const SelectableItem = createSelectableItem<SelectableItemProps>(
+const BaseSelectableItem = createSelectableItem<SelectableItemProps>(
   ({
     tag = 'div',
     className = 'selectable-item',
@@ -42,3 +42,5 @@ export const SelectableItem = createSelectableItem<SelectableItemProps>(
     )
   }
 )
+
+export const SelectableItem = memo(BaseSelectableItem)
