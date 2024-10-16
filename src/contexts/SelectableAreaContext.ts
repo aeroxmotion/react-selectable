@@ -3,6 +3,12 @@ import { createContext } from 'react'
 import { type SelectableEventEmitter } from '../events/EventEmitter'
 import { type SelectableElement } from '../sharedTypes'
 
+/**
+ * Returns `true` whether the given mouse `event`
+ * should be ignored, `false` otherwise.
+ */
+export type IgnoreHandler = (event: MouseEvent) => boolean
+
 export interface SelectableAreaOptions {
   /**
    * Toggle `selected` item. Useful in conjunction
@@ -18,9 +24,9 @@ export interface SelectableAreaOptions {
   /**
    * Selection mode.
    *
-   * 'shift': Add selected items on new selections
-   * 'alt': Alternate between already selected items
-   * 'default' (no value): Only persists selected items from the last selection
+   *  - `shift`: Add selected items on new selections
+   *  - `alt`: De-select on already selected items
+   *  - `default` (no value): Only persists selected items from the last selection
    */
   readonly selectionMode?: 'shift' | 'alt'
 
@@ -33,9 +39,9 @@ export interface SelectableAreaOptions {
   readonly selectionCommands?: boolean
 
   /**
-   * Set of CSS selectors to ignore elements on `mousedown`
+   * Set of CSS selectors or handlers to ignore elements on `mousedown`
    */
-  readonly ignore?: string[]
+  readonly ignore?: (string | IgnoreHandler)[]
 }
 
 export interface SelectableAreaContextValue {

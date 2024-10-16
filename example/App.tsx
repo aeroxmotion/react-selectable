@@ -55,7 +55,10 @@ function App() {
         selectionMode,
         selectionCommands,
         toggleOnClick,
-        ignore: ['.fixed-buttons', '.fixed-buttons *'],
+        ignore: [
+          '.fixed-buttons',
+          ({ target }) => (target as Element).matches('.fixed-buttons *'),
+        ],
       }}
       onSelectionStart={logEvent('selection-start')}
       onSelectionChange={logEvent('selection-change')}

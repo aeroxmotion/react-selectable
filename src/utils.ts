@@ -1,11 +1,14 @@
 import React, { useMemo } from 'react'
 
-import type {
-  MouseEventHandler,
-  SelectableElement,
-  SelectionBoxObject,
+import {
+  type MouseEventHandler,
+  type SelectableElement,
+  type SelectionBoxObject,
 } from './sharedTypes'
-import type { SelectableAreaOptions } from './contexts/SelectableAreaContext'
+import {
+  type IgnoreHandler,
+  type SelectableAreaOptions,
+} from './contexts/SelectableAreaContext'
 
 export const NOOP = () => {}
 export const EMPTY_OBJECT = {}
@@ -64,16 +67,33 @@ export const isItemIntersected = (
   return true
 }
 
+const createSelectorIgnoreHandler =
+  (selector: string): IgnoreHandler =>
+  (event) => {
+    const target = event.target as Element
+
+    return target.matches(selector)
+  }
+
 export const guardMouseHandler = (
-  ignore: SelectableAreaOptions['ignore'] | undefined,
+  ignoreHandlers: SelectableAreaOptions['ignore'] | undefined,
   handler: MouseEventHandler
 ): MouseEventHandler =>
-  !ignore?.length
+  !ignoreHandlers?.length
     ? handler
-    : (e: MouseEvent) => {
-        if (!(e.target as Element).matches(ignore.join(', '))) {
-          handler(e)
+    : (event: MouseEvent) => {
+        for (const ignoreHandler of ignoreHandlers) {
+          const shouldIgnoreEvent =
+            typeof ignoreHandler === 'string'
+              ? createSelectorIgnoreHandler(ignoreHandler)
+              : ignoreHandler
+
+          if (shouldIgnoreEvent(event)) {
+            return
+          }
         }
+
+        handler(event)
       }
 
 type Coordinates = {
