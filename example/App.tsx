@@ -11,9 +11,9 @@ import './App.css'
 
 const items: any[] = mock`
   [
-    (25) {
-      id: ${Math.random}
-      text: ${'Hey'}
+    (100) {
+      id: ${crypto.randomUUID.bind(crypto)}
+      text: ${'Item'}
     }
   ]
 `
@@ -72,11 +72,13 @@ function App() {
           {({ selecting, selected }) => (
             <>
               <p>{item.text}</p>
+
               {selecting && (
                 <p>
                   <i>Selecting</i>
                 </p>
               )}
+
               {selected && (
                 <p>
                   <strong>Selected</strong>
