@@ -1,11 +1,12 @@
-import React, { useReducer, useState } from 'react'
+import React, { useReducer, useRef, useState } from 'react'
 import { mock } from '@mockpiler/compiler'
 
 import {
   SelectableArea,
   SelectableItem,
   SelectionBox,
-  SelectableAreaOptions,
+  type SelectableAreaOptions,
+  type SelectableAreaImperativeMethods,
 } from '../src'
 import './App.css'
 
@@ -27,6 +28,8 @@ const selectionModes: SelectableAreaOptions['selectionMode'][] = [
 const logEvent = (name: string) => (e: any) => console.log(`[${name}]`, e)
 
 function App() {
+  const selectableAreaRef = useRef<SelectableAreaImperativeMethods | null>(null)
+
   const [selectionMode, setSelectionMode] =
     useState<SelectableAreaOptions['selectionMode']>()
   const [toggleOnClick, toggleToggleOnClick] = useReducer(
@@ -49,6 +52,7 @@ function App() {
 
   return (
     <SelectableArea
+      ref={selectableAreaRef}
       tag="section"
       options={{
         selectionEnabled,
@@ -108,6 +112,14 @@ function App() {
 
         <button onClick={toggleSelectionCommands}>
           Selection Commands: {selectionCommands ? 'ON' : 'OFF'}
+        </button>
+
+        <button onClick={() => selectableAreaRef.current?.selectAll()}>
+          Select All
+        </button>
+
+        <button onClick={() => selectableAreaRef.current?.deselectAll()}>
+          De-select All
         </button>
       </div>
     </SelectableArea>

@@ -14,12 +14,12 @@ export interface SelectableAreaOptions {
    * Toggle `selected` item. Useful in conjunction
    * with shift's selection mode
    */
-  readonly toggleOnClick?: boolean
+  toggleOnClick?: boolean
 
   /**
    * When `true` selection is enabled
    */
-  readonly selectionEnabled?: boolean
+  selectionEnabled?: boolean
 
   /**
    * Selection mode.
@@ -28,7 +28,7 @@ export interface SelectableAreaOptions {
    *  - `alt`: De-select on already selected items
    *  - `default` (no value): Only persists selected items from the last selection
    */
-  readonly selectionMode?: 'shift' | 'alt'
+  selectionMode?: 'shift' | 'alt'
 
   /**
    * Switch between selection mode's by using
@@ -36,15 +36,32 @@ export interface SelectableAreaOptions {
    * `alt` key to switch up to alt's selection mode while
    * selecting items
    */
-  readonly selectionCommands?: boolean
+  selectionCommands?: boolean
 
   /**
    * Set of CSS selectors or handlers to ignore elements on `mousedown`
    */
-  readonly ignore?: (string | IgnoreHandler)[]
+  ignore?: (string | IgnoreHandler)[]
 }
 
-export interface SelectableAreaContextValue {
+export interface SelectableAreaImperativeMethods {
+  /**
+   * Performs selection of all `SelectableArea`'s items.
+   *
+   * An alias for `events.trigger('selectAll')`
+   */
+  readonly selectAll: () => void
+
+  /**
+   * Performs de-selection of all `SelectableArea`'s items.
+   *
+   * An alias for `events.trigger('deselectAll')`
+   */
+  readonly deselectAll: () => void
+}
+
+export interface SelectableAreaContextValue
+  extends SelectableAreaImperativeMethods {
   /**
    * Selectable area's ref container
    */
