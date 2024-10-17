@@ -157,7 +157,7 @@ export function createSelectableArea<P>(
         events.trigger('selectionChange', selectionEvent)
       }
 
-      document.addEventListener('mousedown', onMouseDown)
+      $area.addEventListener('mousedown', onMouseDown)
 
       const removeMousedownCreatedEvents = () => {
         document.removeEventListener('mouseup', onMouseUp)
@@ -165,7 +165,7 @@ export function createSelectableArea<P>(
       }
 
       return () => {
-        document.removeEventListener('mousedown', onMouseDown)
+        $area.removeEventListener('mousedown', onMouseDown)
 
         // Whether the component is unmount during `mousemove`
         removeMousedownCreatedEvents()
