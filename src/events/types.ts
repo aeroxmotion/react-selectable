@@ -4,33 +4,33 @@ export type EventMapping = {
   [eventName: string]: any
 }
 
-export type SelectionEvent = {
+export interface SelectionEvent {
   /**
-   *
+   * Original `mouse`'s event
    */
-  originalEvent: MouseEvent
+  readonly originalEvent: MouseEvent
 
   /**
-   *
+   * Current selection's box data
    */
-  selectionBox: SelectionBoxObject
+  readonly selectionBox: SelectionBoxObject
 }
 
-export type SelectedItemEvent = {
+export interface SelectedItemEvent {
   /**
    *
    */
-  id: number
+  readonly id: number
 
   /**
    *
    */
-  element: Element
+  readonly element: Element
 
   /**
    *
    */
-  value: any
+  readonly value: any
 }
 
 export interface SelectableEvents {

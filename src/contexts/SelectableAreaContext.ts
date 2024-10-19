@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { type MutableRefObject, createContext } from 'react'
 
 import { type SelectableEventEmitter } from '../events/EventEmitter'
 import { type SelectableElement } from '../sharedTypes'
@@ -65,7 +65,7 @@ export interface SelectableAreaContextValue
   /**
    * Selectable area's ref container
    */
-  readonly areaRef: React.MutableRefObject<SelectableElement | null>
+  readonly areaRef: MutableRefObject<SelectableElement | null>
 
   /**
    * Events manager
