@@ -1,6 +1,23 @@
+/**
+ * Any element valid to select.
+ */
 export type SelectableElement = HTMLElement | SVGElement
 
-export type MouseEventHandler = (e: MouseEvent) => void
+/**
+ * For mouse-event handlers like `mousedown`, `mousemove` and `mouseup`.
+ */
+export type MouseEventHandler = (event: MouseEvent) => void
+
+/**
+ * Returns `true` whether the given mouse `event`
+ * should be ignored, `false` otherwise.
+ */
+export type IgnoreHandler = (event: MouseEvent) => boolean
+
+/**
+ * Any CSS Selector or ignore handler.
+ */
+export type IgnoreCriteria = string | IgnoreHandler
 
 export interface SelectionBoxObject {
   /**

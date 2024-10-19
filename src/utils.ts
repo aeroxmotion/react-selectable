@@ -40,35 +40,6 @@ export const isItemIntersected = (
   return true
 }
 
-const createSelectorIgnoreHandler =
-  (selector: string): IgnoreHandler =>
-  (event) => {
-    const target = event.target as Element
-
-    return target.matches(selector)
-  }
-
-export const guardMouseHandler = (
-  ignoreHandlers: SelectableAreaOptions['ignore'] | undefined,
-  handler: MouseEventHandler
-): MouseEventHandler =>
-  !ignoreHandlers?.length
-    ? handler
-    : (event: MouseEvent) => {
-        for (const ignoreHandler of ignoreHandlers) {
-          const shouldIgnoreEvent =
-            typeof ignoreHandler === 'string'
-              ? createSelectorIgnoreHandler(ignoreHandler)
-              : ignoreHandler
-
-          if (shouldIgnoreEvent(event)) {
-            return
-          }
-        }
-
-        handler(event)
-      }
-
 type Coordinates = {
   x: number
   y: number

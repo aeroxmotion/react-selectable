@@ -18,10 +18,8 @@ import { type SelectionEvent, type SelectedItemEvent } from '../events/types'
 import {
   EMPTY_OBJECT,
   getRelativeCoordinatesToArea,
-  guardMouseHandler,
   mergeUnsubFns,
   NOOP,
-  ensureAreaRef,
 } from '../utils'
 import {
   type SelectionBoxObject,
@@ -29,6 +27,7 @@ import {
   type SelectableElement,
 } from '../sharedTypes'
 import { useStateRef } from '../hooks/useStateRef'
+import { useMouseDownHandler } from '../hooks/useMouseDownHandler'
 
 export interface SelectableAreaComponentProps {
   /**
@@ -61,8 +60,6 @@ export interface SelectableAreaComponentProps {
    */
   onDeselectedItem?: (deselected: SelectedItemEvent) => void
 }
-
-const MAIN_MOUSE_BUTTON = 0
 
 export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
   const AnyComp = Comp as any
@@ -144,31 +141,27 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
         [onMouseMove]
       )
 
-      const onMouseDown = useMemo(
-        () =>
-          guardMouseHandler(ignore, (e) => {
-            if (e.button !== MAIN_MOUSE_BUTTON || e.ctrlKey) {
-              return
-            }
+      const onMouseDown = useMouseDownHandler(
+        (e) => {
+          const nextSelectionBox: SelectionBoxObject = {
+            ...getRelativeCoordinatesToArea(areaRef.current!, e),
+            width: 0,
+            height: 0,
+          }
 
-            const nextSelectionBox: SelectionBoxObject = {
-              ...getRelativeCoordinatesToArea(areaRef.current!, e),
-              width: 0,
-              height: 0,
-            }
+          const selectionEvent: SelectionEvent = {
+            originalEvent: e,
+            selectionBox: nextSelectionBox,
+          }
 
-            const selectionEvent: SelectionEvent = {
-              originalEvent: e,
-              selectionBox: nextSelectionBox,
-            }
+          startSelectionBoxRef.current = selectionBoxRef.current =
+            nextSelectionBox
+          events.trigger('selectionStart', selectionEvent)
 
-            startSelectionBoxRef.current = selectionBoxRef.current =
-              nextSelectionBox
-            events.trigger('selectionStart', selectionEvent)
-
-            document.addEventListener('mousemove', onMouseMove)
-            document.addEventListener('mouseup', onMouseUp, { once: true })
-          }),
+          document.addEventListener('mousemove', onMouseMove)
+          document.addEventListener('mouseup', onMouseUp, { once: true })
+        },
+        ignore,
         [areaRef.current, ignore, onMouseUp, onMouseMove]
       )
 
