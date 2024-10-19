@@ -12,7 +12,7 @@ import './App.css'
 
 const items: any[] = mock`
   [
-    (100) {
+    (200) {
       id: ${crypto.randomUUID.bind(crypto)}
       text: ${'Item'}
     }
@@ -72,25 +72,9 @@ function App() {
       onDeselectedItem={logEvent('deselected-item')}>
       <SelectionBox />
 
-      {items.map((item) => (
+      {items.map((item, index) => (
         <SelectableItem tag="article" key={item.id} selectableID={item.id}>
-          {({ selecting, selected }) => (
-            <>
-              <p>{item.text}</p>
-
-              {selecting && (
-                <p>
-                  <i>Selecting</i>
-                </p>
-              )}
-
-              {selected && (
-                <p>
-                  <strong>Selected</strong>
-                </p>
-              )}
-            </>
-          )}
+          <p>{index}</p>
         </SelectableItem>
       ))}
 
