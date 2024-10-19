@@ -1,14 +1,11 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 
-import {
-  type MouseEventHandler,
-  type SelectableElement,
-  type SelectionBoxObject,
-} from './sharedTypes'
-import {
-  type IgnoreHandler,
-  type SelectableAreaOptions,
-} from './contexts/SelectableAreaContext'
+import { type SelectionBoxObject } from './sharedTypes'
+
+type Coordinates = {
+  x: number
+  y: number
+}
 
 export const NOOP = () => {}
 export const EMPTY_OBJECT = {}
@@ -21,28 +18,12 @@ export const isItemIntersected = (
   const itemRect = $item.getBoundingClientRect()
   const itemCoordinates = getRelativeCoordinatesToArea($area, itemRect)
 
-  if (itemCoordinates.x + itemRect.width < selectionBox.x) {
-    return false
-  }
-
-  if (itemCoordinates.x > selectionBox.x + selectionBox.width) {
-    return false
-  }
-
-  if (itemCoordinates.y + itemRect.height < selectionBox.y) {
-    return false
-  }
-
-  if (itemCoordinates.y > selectionBox.y + selectionBox.height) {
-    return false
-  }
-
-  return true
-}
-
-type Coordinates = {
-  x: number
-  y: number
+  return (
+    itemCoordinates.x + itemRect.width >= selectionBox.x &&
+    itemCoordinates.x <= selectionBox.x + selectionBox.width &&
+    itemCoordinates.y + itemRect.height >= selectionBox.y &&
+    itemCoordinates.y <= selectionBox.y + selectionBox.height
+  )
 }
 
 export const getRelativeCoordinatesToArea = (
