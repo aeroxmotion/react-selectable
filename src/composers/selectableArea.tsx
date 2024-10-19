@@ -61,6 +61,8 @@ export interface SelectableAreaComponentProps {
   onDeselectedItem?: (deselected: SelectedItemEvent) => void
 }
 
+const MAIN_MOUSE_BUTTON = 0
+
 export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
   const AnyComp = Comp as any
 
@@ -140,7 +142,10 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
       const onMouseDown = useMemo(
         () =>
           guardMouseHandler(ignore, (e) => {
-            console.log('What????')
+            if (e.button !== MAIN_MOUSE_BUTTON) {
+              return
+            }
+
             // Use as HTMLElement so we can listen to mouse events
             const $area = ensureAreaRef(areaRef) as HTMLElement
 

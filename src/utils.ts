@@ -82,7 +82,6 @@ export const guardMouseHandler = (
   !ignoreHandlers?.length
     ? handler
     : (event: MouseEvent) => {
-        console.log('Clicking here')
         for (const ignoreHandler of ignoreHandlers) {
           const shouldIgnoreEvent =
             typeof ignoreHandler === 'string'
