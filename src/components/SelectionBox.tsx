@@ -36,10 +36,14 @@ const BaseSelectionBox: React.FC<SelectionBoxProps> = ({
     ...attributes,
     className,
     style: {
-      [`--${customPropertyPrefix}-x`]: `${selectionBox.x}px`,
-      [`--${customPropertyPrefix}-y`]: `${selectionBox.y}px`,
-      [`--${customPropertyPrefix}-width`]: `${selectionBox.width}px`,
-      [`--${customPropertyPrefix}-height`]: `${selectionBox.height}px`,
+      [`--${customPropertyPrefix}-x`]: selectionBox.x,
+      [`--${customPropertyPrefix}-y`]: selectionBox.y,
+      [`--${customPropertyPrefix}-x-px`]: `${selectionBox.x}px`,
+      [`--${customPropertyPrefix}-y-px`]: `${selectionBox.y}px`,
+      [`--${customPropertyPrefix}-width`]: selectionBox.width,
+      [`--${customPropertyPrefix}-height`]: selectionBox.height,
+      [`--${customPropertyPrefix}-width-px`]: `${selectionBox.width}px`,
+      [`--${customPropertyPrefix}-height-px`]: `${selectionBox.height}px`,
       ...attributes.style,
     },
   })

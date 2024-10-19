@@ -51,10 +51,18 @@ body {
 .selection-box {
   position: absolute;
 
-  top: var(--selection-box-y);
-  left: var(--selection-box-x);
-  width: var(--selection-box-width);
-  height: var(--selection-box-height);
+  transform-origin: top left;
+  transform: matrix(
+    var(--selection-box-width),
+    0,
+    0,
+    var(--selection-box-height),
+    var(--selection-box-x),
+    var(--selection-box-y)
+  );
+
+  width: 1px;
+  height: 1px;
 
   background-color: rgba(0, 0, 0, 0.4);
 }
