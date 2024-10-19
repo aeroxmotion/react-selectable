@@ -147,7 +147,7 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
       const onMouseDown = useMemo(
         () =>
           guardMouseHandler(ignore, (e) => {
-            if (e.button !== MAIN_MOUSE_BUTTON) {
+            if (e.button !== MAIN_MOUSE_BUTTON || e.ctrlKey) {
               return
             }
 
