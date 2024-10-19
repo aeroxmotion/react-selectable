@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { type SelectionEvent, type SelectedItemEvent } from '../events/types'
 import { SelectableItemContext } from '../contexts/SelectableItemContext'
@@ -39,53 +39,47 @@ export function createSelectableItem<P>(
     const itemId = useMemo(() => ++currentItemId, [])
 
     const firstItemRender = useRef(true)
-    const startSelectionEventRef = useRef<SelectionEvent | null>(null)
+
     const itemRef = useRef<SelectableElement | null>(null)
+
+    const startSelectionModeRef = useRef(selectionMode)
+    const startSelectionEventRef = useRef<SelectionEvent | null>(null)
 
     const [state, updateState] = useShallowState(() => ({
       selected: false,
       selecting: false,
     }))
 
-    useEffect(() => {
-      if (firstItemRender.current) {
-        firstItemRender.current = false
-        return
-      }
-
-      // Trigger event after re-render
-      events.trigger(`${state.selected ? '' : 'de'}selectedItem`, {
-        id: itemId,
-        element: itemRef.current!,
-        value: selectableValue,
-      })
-    }, [state.selected])
-
-    useEffect(() => {
+    const onSelectionChange = useCallback((e: SelectionEvent) => {
       const $area = ensureAreaRef(areaRef)
-      const $item = ensureItemRef(itemRef)
+      const $item = ensureAreaRef(itemRef)
 
-      let startSelectionMode = selectionMode
+      updateState({
+        selecting: isItemIntersected($area, $item, e.selectionBox),
+      })
+    }, [])
 
-      const onSelectionStart = (e: SelectionEvent) => {
+    const onSelectionStart = useCallback(
+      (e: SelectionEvent) => {
         startSelectionEventRef.current = e
 
-        let shiftPressed = e.originalEvent.shiftKey
+        const shiftPressed = e.originalEvent.shiftKey
 
         if ((shiftPressed || e.originalEvent.altKey) && selectionCommands) {
-          startSelectionMode = shiftPressed ? 'shift' : 'alt'
+          startSelectionModeRef.current = shiftPressed ? 'shift' : 'alt'
         }
 
         onSelectionChange(e)
-      }
+      },
+      [onSelectionChange, selectionCommands]
+    )
 
-      const onSelectionChange = (e: SelectionEvent) => {
-        updateState({
-          selecting: isItemIntersected($area, $item, e.selectionBox),
-        })
-      }
+    const onSelectionEnd = useCallback(
+      (e: SelectionEvent) => {
+        const $area = ensureAreaRef(areaRef)
+        const $item = ensureAreaRef(itemRef)
 
-      const onSelectionEnd = (e: SelectionEvent) => {
+        const startSelectionMode = startSelectionModeRef.current
         const {
           originalEvent: { target: startTarget },
         } = startSelectionEventRef.current!
@@ -116,26 +110,45 @@ export function createSelectableItem<P>(
         }))
 
         startSelectionEventRef.current = null
-        startSelectionMode = selectionMode
+        startSelectionModeRef.current = selectionMode
+      },
+      [selectionMode, toggleOnClick]
+    )
+
+    const onSelectAll = useCallback(() => {
+      updateState({ selected: true })
+    }, [])
+
+    const onDeselectAll = useCallback(() => {
+      updateState({ selected: false })
+    }, [])
+
+    useEffect(() => {
+      if (firstItemRender.current) {
+        firstItemRender.current = false
+        return
       }
 
-      const onSelectAll = () => {
-        updateState({ selected: true })
-      }
+      // Trigger event after re-render
+      events.trigger(`${state.selected ? '' : 'de'}selectedItem`, {
+        id: itemId,
+        value: selectableValue,
+        element: itemRef.current!,
+      })
+    }, [state.selected])
 
-      const onDeselectAll = () => {
-        updateState({ selected: false })
-      }
+    useEffect(
+      () =>
+        mergeUnsubFns([
+          events.on('selectionStart', onSelectionStart),
+          events.on('selectionChange', onSelectionChange),
+          events.on('selectionEnd', onSelectionEnd),
 
-      return mergeUnsubFns([
-        events.on('selectionStart', onSelectionStart),
-        events.on('selectionChange', onSelectionChange),
-        events.on('selectionEnd', onSelectionEnd),
-
-        events.on('selectAll', onSelectAll),
-        events.on('deselectAll', onDeselectAll),
-      ])
-    }, [selectionMode, selectionCommands, toggleOnClick])
+          events.on('selectAll', onSelectAll),
+          events.on('deselectAll', onDeselectAll),
+        ]),
+      [selectionMode, selectionCommands, toggleOnClick]
+    )
 
     return (
       <SelectableItemContext.Provider
