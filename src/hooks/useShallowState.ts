@@ -18,7 +18,7 @@ export function useShallowState<S extends object>(
         const nextStateObj =
           typeof nextState === 'function' ? nextState(prevState) : nextState
 
-        const keys: Array<keyof S> = Object.keys(nextStateObj) as any
+        const keys = Object.keys(nextStateObj) as Array<keyof S>
 
         for (const key of keys) {
           if (prevState[key] !== nextStateObj[key]) {

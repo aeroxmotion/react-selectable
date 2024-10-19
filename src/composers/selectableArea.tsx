@@ -28,6 +28,7 @@ import {
   type MouseEventHandler,
   type SelectableElement,
 } from '../sharedTypes'
+import { useStateRef } from '../hooks/useStateRef'
 
 export interface SelectableAreaComponentProps {
   /**
@@ -84,7 +85,7 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
     ) => {
       const { selectionEnabled, ignore } = options
 
-      const areaRef = useRef<SelectableElement>(null)
+      const areaRef = useStateRef<SelectableElement | null>(null)
       const startSelectionBoxRef = useRef<SelectionBoxObject | null>(null)
       const selectionBoxRef = useRef<SelectionBoxObject | null>(null)
 
@@ -105,39 +106,43 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
         [events]
       )
 
-      const onMouseUp: MouseEventHandler = useCallback((e) => {
-        const selectionEvent: SelectionEvent = {
-          originalEvent: e,
-          selectionBox: selectionBoxRef.current!,
-        }
+      const onMouseMove: MouseEventHandler = useCallback(
+        (e) => {
+          const startSelectionBox = startSelectionBoxRef.current!
+          const { x, y } = getRelativeCoordinatesToArea(areaRef.current!, e)
 
-        startSelectionBoxRef.current = selectionBoxRef.current = null
-        events.trigger('selectionEnd', selectionEvent)
+          const nextSelectionBox: SelectionBoxObject = {
+            x: Math.min(startSelectionBox.x, x),
+            y: Math.min(startSelectionBox.y, y),
+            width: Math.abs(x - startSelectionBox.x),
+            height: Math.abs(y - startSelectionBox.y),
+          }
 
-        removeMousedownCreatedEvents()
-      }, [])
+          const selectionEvent: SelectionEvent = {
+            originalEvent: e,
+            selectionBox: nextSelectionBox,
+          }
 
-      const onMouseMove: MouseEventHandler = useCallback((e) => {
-        const $area = ensureAreaRef(areaRef)
+          selectionBoxRef.current = nextSelectionBox
+          events.trigger('selectionChange', selectionEvent)
+        },
+        [areaRef.current]
+      )
 
-        const startSelectionBox = startSelectionBoxRef.current!
-        const { x, y } = getRelativeCoordinatesToArea($area, e)
+      const onMouseUp: MouseEventHandler = useCallback(
+        (e) => {
+          const selectionEvent: SelectionEvent = {
+            originalEvent: e,
+            selectionBox: selectionBoxRef.current!,
+          }
 
-        const nextSelectionBox: SelectionBoxObject = {
-          x: Math.min(startSelectionBox.x, x),
-          y: Math.min(startSelectionBox.y, y),
-          width: Math.abs(x - startSelectionBox.x),
-          height: Math.abs(y - startSelectionBox.y),
-        }
+          startSelectionBoxRef.current = selectionBoxRef.current = null
+          events.trigger('selectionEnd', selectionEvent)
 
-        const selectionEvent: SelectionEvent = {
-          originalEvent: e,
-          selectionBox: nextSelectionBox,
-        }
-
-        selectionBoxRef.current = nextSelectionBox
-        events.trigger('selectionChange', selectionEvent)
-      }, [])
+          document.removeEventListener('mousemove', onMouseMove)
+        },
+        [onMouseMove]
+      )
 
       const onMouseDown = useMemo(
         () =>
@@ -146,11 +151,8 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
               return
             }
 
-            // Use as HTMLElement so we can listen to mouse events
-            const $area = ensureAreaRef(areaRef) as HTMLElement
-
             const nextSelectionBox: SelectionBoxObject = {
-              ...getRelativeCoordinatesToArea($area, e),
+              ...getRelativeCoordinatesToArea(areaRef.current!, e),
               width: 0,
               height: 0,
             }
@@ -164,16 +166,11 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
               nextSelectionBox
             events.trigger('selectionStart', selectionEvent)
 
-            document.addEventListener('mouseup', onMouseUp)
             document.addEventListener('mousemove', onMouseMove)
+            document.addEventListener('mouseup', onMouseUp, { once: true })
           }),
-        [ignore, onMouseUp, onMouseMove]
+        [areaRef.current, ignore, onMouseUp, onMouseMove]
       )
-
-      const removeMousedownCreatedEvents = useCallback(() => {
-        document.removeEventListener('mouseup', onMouseUp)
-        document.removeEventListener('mousemove', onMouseMove)
-      }, [onMouseUp, onMouseMove])
 
       useImperativeHandle(ref, () => imperativeMethods, [imperativeMethods])
 
@@ -197,26 +194,36 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
 
       useEffect(() => {
         // Avoid selection
-        if (selectionEnabled === false) {
+        if (selectionEnabled === false || !areaRef.current) {
           return
         }
 
-        // Use as HTMLElement so we can listen to mouse events
-        const $area = ensureAreaRef(areaRef) as HTMLElement
+        const $area = areaRef.current as HTMLElement
 
         $area.addEventListener('mousedown', onMouseDown)
 
         return () => {
           $area.removeEventListener('mousedown', onMouseDown)
 
-          // Whether the component is unmount during `mousemove`
-          removeMousedownCreatedEvents()
+          document.removeEventListener('mouseup', onMouseUp)
+          document.removeEventListener('mousemove', onMouseMove)
         }
-      }, [selectionEnabled, onMouseDown, removeMousedownCreatedEvents])
+      }, [
+        areaRef.current,
+        onMouseUp,
+        onMouseDown,
+        onMouseMove,
+        selectionEnabled,
+      ])
 
       return (
         <SelectableAreaContext.Provider
-          value={{ areaRef, events, options, ...imperativeMethods }}>
+          value={{
+            areaRef,
+            events,
+            options,
+            ...imperativeMethods,
+          }}>
           <AnyComp {...props} />
         </SelectableAreaContext.Provider>
       )

@@ -4,13 +4,9 @@ import { type SelectionEvent, type SelectedItemEvent } from '../events/types'
 import { SelectableItemContext } from '../contexts/SelectableItemContext'
 import { useSelectableArea } from '../hooks/useSelectableArea'
 import { useShallowState } from '../hooks/useShallowState'
-import {
-  ensureAreaRef,
-  ensureItemRef,
-  isItemIntersected,
-  mergeUnsubFns,
-} from '../utils'
+import { isItemIntersected, mergeUnsubFns } from '../utils'
 import type { SelectableElement } from '../sharedTypes'
+import { useStateRef } from '../hooks/useStateRef'
 
 // TODO: Should be configurable by user's options?
 const TOGGLE_ON_CLICK_TRESHOLD = 5
@@ -40,7 +36,7 @@ export function createSelectableItem<P>(
 
     const firstItemRender = useRef(true)
 
-    const itemRef = useRef<SelectableElement | null>(null)
+    const itemRef = useStateRef<SelectableElement | null>(null)
 
     const startSelectionModeRef = useRef(selectionMode)
     const startSelectionEventRef = useRef<SelectionEvent | null>(null)
@@ -50,14 +46,18 @@ export function createSelectableItem<P>(
       selecting: false,
     }))
 
-    const onSelectionChange = useCallback((e: SelectionEvent) => {
-      const $area = ensureAreaRef(areaRef)
-      const $item = ensureAreaRef(itemRef)
-
-      updateState({
-        selecting: isItemIntersected($area, $item, e.selectionBox),
-      })
-    }, [])
+    const onSelectionChange = useCallback(
+      (e: SelectionEvent) => {
+        updateState({
+          selecting: isItemIntersected(
+            areaRef.current!,
+            itemRef.current!,
+            e.selectionBox
+          ),
+        })
+      },
+      [areaRef.current, itemRef.current]
+    )
 
     const onSelectionStart = useCallback(
       (e: SelectionEvent) => {
@@ -76,8 +76,7 @@ export function createSelectableItem<P>(
 
     const onSelectionEnd = useCallback(
       (e: SelectionEvent) => {
-        const $area = ensureAreaRef(areaRef)
-        const $item = ensureAreaRef(itemRef)
+        const $item = itemRef.current!
 
         const startSelectionMode = startSelectionModeRef.current
         const {
@@ -100,7 +99,7 @@ export function createSelectableItem<P>(
 
         updateState((prevState) => ({
           selecting: false,
-          selected: isItemIntersected($area, $item, e.selectionBox)
+          selected: isItemIntersected(areaRef.current!, $item, e.selectionBox)
             ? startSelectionMode === 'alt'
               ? !prevState.selected // Toggle selection on alternate mode
               : !toggleOnClick || getToggleOnClick(prevState.selected)
@@ -112,7 +111,7 @@ export function createSelectableItem<P>(
         startSelectionEventRef.current = null
         startSelectionModeRef.current = selectionMode
       },
-      [selectionMode, toggleOnClick]
+      [areaRef.current, itemRef.current, selectionMode, toggleOnClick]
     )
 
     const onSelectAll = useCallback(() => {
