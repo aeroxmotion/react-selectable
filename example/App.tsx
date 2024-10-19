@@ -28,6 +28,7 @@ const selectionModes: SelectableAreaOptions['selectionMode'][] = [
 const logEvent = (name: string) => (e: any) => console.log(`[${name}]`, e)
 
 function App() {
+  const [selectedItemID, setSelectedItemID] = useState('')
   const selectableAreaRef = useRef<SelectableAreaImperativeMethods | null>(null)
 
   const [selectionMode, setSelectionMode] =
@@ -72,7 +73,7 @@ function App() {
       <SelectionBox />
 
       {items.map((item) => (
-        <SelectableItem tag="article" key={item.id} selectableValue={item.id}>
+        <SelectableItem tag="article" key={item.id} selectableID={item.id}>
           {({ selecting, selected }) => (
             <>
               <p>{item.text}</p>
@@ -120,6 +121,34 @@ function App() {
 
         <button onClick={() => selectableAreaRef.current?.deselectAll()}>
           De-select All
+        </button>
+
+        <select
+          value={selectedItemID}
+          onChange={(e) => {
+            setSelectedItemID(e.target.value)
+          }}>
+          <option value="" disabled>
+            No item selected
+          </option>
+
+          {items.map((item, index) => (
+            <option key={item.id} value={item.id}>
+              {index + 1}: {item.id}
+            </option>
+          ))}
+        </select>
+
+        <button
+          disabled={!selectedItemID}
+          onClick={() => selectableAreaRef.current?.select(selectedItemID)}>
+          Select item
+        </button>
+
+        <button
+          disabled={!selectedItemID}
+          onClick={() => selectableAreaRef.current?.deselect(selectedItemID)}>
+          De-select item
         </button>
       </div>
     </SelectableArea>

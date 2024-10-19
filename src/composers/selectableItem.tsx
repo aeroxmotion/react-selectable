@@ -1,38 +1,34 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 
-import { type SelectionEvent, type SelectedItemEvent } from '../events/types'
-import { SelectableItemContext } from '../contexts/SelectableItemContext'
-import { useSelectableArea } from '../hooks/useSelectableArea'
+import { useStateRef } from '../hooks/useStateRef'
+import { type SelectionEvent } from '../events/types'
 import { useShallowState } from '../hooks/useShallowState'
 import { isItemIntersected, mergeUnsubFns } from '../utils'
-import type { SelectableElement } from '../sharedTypes'
-import { useStateRef } from '../hooks/useStateRef'
+import { useSelectableArea } from '../hooks/useSelectableArea'
+import { SelectableItemContext } from '../contexts/SelectableItemContext'
+import { type SelectableElement, type SelectableID } from '../sharedTypes'
 
 // TODO: Should be configurable by user's options?
 const TOGGLE_ON_CLICK_TRESHOLD = 5
 
 export interface SelectableItemComponentProps {
   /**
-   * TODO
+   * Optional custom ID
    */
-  selectableValue?: SelectedItemEvent['value']
+  selectableID?: SelectableID
 }
-
-let currentItemId = 0
 
 export function createSelectableItem<P>(
   Comp: React.ComponentType<P>
 ): React.FC<P & SelectableItemComponentProps> {
   const AnyComp = Comp as any
 
-  return ({ selectableValue, ...props }) => {
+  return ({ selectableID = crypto.randomUUID(), ...props }) => {
     const {
       areaRef,
       events,
       options: { selectionMode, selectionCommands, toggleOnClick },
     } = useSelectableArea()
-
-    const itemId = useMemo(() => ++currentItemId, [])
 
     const firstItemRender = useRef(true)
 
@@ -114,11 +110,11 @@ export function createSelectableItem<P>(
       [areaRef.current, itemRef.current, selectionMode, toggleOnClick]
     )
 
-    const onSelectAll = useCallback(() => {
+    const selectItem = useCallback(() => {
       updateState({ selected: true })
     }, [])
 
-    const onDeselectAll = useCallback(() => {
+    const deselectItem = useCallback(() => {
       updateState({ selected: false })
     }, [])
 
@@ -130,8 +126,7 @@ export function createSelectableItem<P>(
 
       // Trigger event after re-render
       events.trigger(`${state.selected ? '' : 'de'}selectedItem`, {
-        id: itemId,
-        value: selectableValue,
+        id: selectableID,
         element: itemRef.current!,
       })
     }, [state.selected])
@@ -143,17 +138,25 @@ export function createSelectableItem<P>(
           events.on('selectionChange', onSelectionChange),
           events.on('selectionEnd', onSelectionEnd),
 
-          events.on('selectAll', onSelectAll),
-          events.on('deselectAll', onDeselectAll),
+          events.on('selectAll', selectItem),
+          events.on('deselectAll', deselectItem),
+          events.on(`select:${selectableID}`, selectItem),
+          events.on(`deselect:${selectableID}`, deselectItem),
         ]),
-      [selectionMode, selectionCommands, toggleOnClick]
+      [
+        selectItem,
+        deselectItem,
+        onSelectionStart,
+        onSelectionChange,
+        onSelectionEnd,
+      ]
     )
 
     return (
       <SelectableItemContext.Provider
         value={{
-          itemId,
           itemRef,
+          selectableID,
           ...state,
         }}>
         <AnyComp {...props} />

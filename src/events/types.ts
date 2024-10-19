@@ -1,4 +1,4 @@
-import { type SelectionBoxObject } from '../sharedTypes'
+import { type SelectableID, type SelectionBoxObject } from '../sharedTypes'
 
 export type EventMapping = {
   [eventName: string]: any
@@ -20,17 +20,12 @@ export interface SelectedItemEvent {
   /**
    *
    */
-  readonly id: number
+  readonly id: SelectableID
 
   /**
    *
    */
   readonly element: Element
-
-  /**
-   *
-   */
-  readonly value: any
 }
 
 export interface SelectableEvents {
@@ -58,6 +53,16 @@ export interface SelectableEvents {
    *
    */
   deselectAll: void
+
+  /**
+   *
+   */
+  [select: `select:${SelectableID}`]: void
+
+  /**
+   *
+   */
+  [deselect: `deselect:${SelectableID}`]: void
 
   /**
    *

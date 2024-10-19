@@ -93,6 +93,12 @@ export function createSelectableArea<P>(Comp: React.ComponentType<P>) {
 
       const imperativeMethods: SelectableAreaImperativeMethods = useMemo(
         () => ({
+          select(id) {
+            events.trigger(`select:${id}`, void 0)
+          },
+          deselect(id) {
+            events.trigger(`deselect:${id}`, void 0)
+          },
           selectAll() {
             events.trigger('selectAll', void 0)
           },

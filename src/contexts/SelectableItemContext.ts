@@ -1,12 +1,12 @@
 import { type MutableRefObject, createContext } from 'react'
 
-import type { SelectableElement } from '../sharedTypes'
+import { type SelectableElement, type SelectableID } from '../sharedTypes'
 
 export interface SelectableItemContextValue {
   /**
    * Selectable item's id. Useful for debugging purposes.
    */
-  readonly itemId: number
+  readonly selectableID: SelectableID
 
   /**
    * Selectable item's ref container

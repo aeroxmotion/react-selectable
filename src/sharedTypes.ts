@@ -19,6 +19,11 @@ export type IgnoreHandler = (event: MouseEvent) => boolean
  */
 export type IgnoreCriteria = string | IgnoreHandler
 
+/**
+ *
+ */
+export type SelectableID = string | number
+
 export interface SelectionBoxObject {
   /**
    * x-position in px relative to `SelectableArea`'s container

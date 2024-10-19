@@ -1,7 +1,7 @@
 import { type MutableRefObject, createContext } from 'react'
 
 import { type SelectableEventEmitter } from '../events/EventEmitter'
-import { type SelectableElement } from '../sharedTypes'
+import { type SelectableID, type SelectableElement } from '../sharedTypes'
 
 /**
  * Returns `true` whether the given mouse `event`
@@ -46,14 +46,28 @@ export interface SelectableAreaOptions {
 
 export interface SelectableAreaImperativeMethods {
   /**
-   * Performs selection of all `SelectableArea`'s items.
+   * Performs selection from a given item's id.
+   *
+   * An alias for `events.trigger('select:<id>')`
+   */
+  readonly select: (id: SelectableID) => void
+
+  /**
+   * Performs de-selection from a given item's id.
+   *
+   * An alias for `events.trigger('deselect:<id>')`
+   */
+  readonly deselect: (id: SelectableID) => void
+
+  /**
+   * Performs selection from all `SelectableArea`'s items.
    *
    * An alias for `events.trigger('selectAll')`
    */
   readonly selectAll: () => void
 
   /**
-   * Performs de-selection of all `SelectableArea`'s items.
+   * Performs de-selection from all `SelectableArea`'s items.
    *
    * An alias for `events.trigger('deselectAll')`
    */

@@ -39,7 +39,7 @@ const BaseSelectableItem = createSelectableItem<SelectableItemProps>(
     children,
     ...attributes
   }) => {
-    const { itemId, itemRef, selecting, selected } = useSelectableItem()
+    const { selectableID, itemRef, selecting, selected } = useSelectableItem()
 
     return React.createElement(
       tag,
@@ -53,7 +53,7 @@ const BaseSelectableItem = createSelectableItem<SelectableItemProps>(
         ]),
       },
       typeof children === 'function'
-        ? children({ itemId, selected, selecting })
+        ? children({ selectableID, selected, selecting })
         : children
     )
   }
