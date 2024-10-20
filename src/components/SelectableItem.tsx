@@ -7,19 +7,41 @@ import { useJoinClassNames } from '../utils'
 
 export type SelectableItemClassNames = {
   /**
-   *
+   * CSS class applied when the item is selected.
    */
   selected?: string
 
   /**
-   *
+   * CSS class applied when the item is being hovered.
    */
   selecting?: string
 }
 
 export interface SelectableItemProps extends React.HTMLAttributes<HTMLElement> {
+  /**
+   * Custom tag (defaults to `div`).
+   */
   tag?: keyof HTMLElementTagNameMap
+
+  /**
+   * CSS classes.
+   */
   classNames?: SelectableItemClassNames
+
+  /**
+   * Allows to pass a custom render function to access current `SelectableItem`'s context.
+   *
+   * ```ts
+   * <SelectableItem>
+   *   {({ selecting, selected }) => (
+   *     <>
+   *       {selecting && <p>Selecting</p>}
+   *       {selecting && <p>De-select all</p>}
+   *     </>
+   *   )}
+   * </SelectableItem>
+   * ```
+   */
   children?:
     | React.ReactNode
     | ((item: Omit<SelectableItemContextValue, 'itemRef'>) => React.ReactNode)

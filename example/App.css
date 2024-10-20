@@ -35,6 +35,7 @@ body {
   background-color: #fff;
 
   user-select: none;
+  transition: 50ms all linear;
 
   p {
     margin: 0;
